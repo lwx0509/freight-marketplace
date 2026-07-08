@@ -19,7 +19,7 @@ import mimetypes
 # Config
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
-DB_PATH = os.path.join(SCRIPT_DIR, 'freight.db')
+DB_PATH = os.getenv('DB_PATH', os.path.join(SCRIPT_DIR, 'freight.db'))
 SCHEMA_PATH = os.path.join(SCRIPT_DIR, 'schema.sql')
 FRONTEND_DIR = os.path.join(PROJECT_ROOT, 'frontend')
 PORT = int(os.getenv('PORT', 8000))  # Railway sets PORT env var
@@ -121,7 +121,13 @@ class FreightHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def serve_static(self, file_path, content_type):
-        """Serve static files"""
+        """Serve static files (restricted to FRONTEND_DIR)"""
+        # Prevent path traversal outside the frontend directory
+        real_path = os.path.realpath(file_path)
+        if not real_path.startswith(os.path.realpath(FRONTEND_DIR) + os.sep):
+            self.send_response(404)
+            self.end_headers()
+            return
         try:
             with open(file_path, 'rb') as f:
                 self.send_response(200)
@@ -180,7 +186,7 @@ class FreightHandler(BaseHTTPRequestHandler):
     # ========== Auth Endpoints ==========
     def signup(self, data):
         """POST /api/signup - Register new user"""
-        email = data.get('email', '').strip()
+        email = data.get('email', '').strip().lower()
         password = data.get('password', '')
         name = data.get('name', '').strip()
         user_type = data.get('user_type', 'shipper')  # 'shipper' or 'company'
@@ -213,7 +219,7 @@ class FreightHandler(BaseHTTPRequestHandler):
 
     def login(self, data):
         """POST /api/login - Authenticate user"""
-        email = data.get('email', '').strip()
+        email = data.get('email', '').strip().lower()
         password = data.get('password', '')
 
         if not email or not password:
@@ -322,6 +328,11 @@ class FreightHandler(BaseHTTPRequestHandler):
         conn = get_db()
         user = conn.execute('SELECT user_type FROM users WHERE id = ?', (user_id,)).fetchone()
 
+        if not user:
+            conn.close()
+            self.json_response({'error': 'Unauthorized'}, 401)
+            return
+
         if user['user_type'] == 'shipper':
             # Shippers see their own shipments
             shipments = conn.execute(
@@ -405,6 +416,11 @@ class FreightHandler(BaseHTTPRequestHandler):
 
         conn = get_db()
         user = conn.execute('SELECT user_type FROM users WHERE id = ?', (user_id,)).fetchone()
+
+        if not user:
+            conn.close()
+            self.json_response({'error': 'Unauthorized'}, 401)
+            return
 
         if user['user_type'] == 'shipper':
             # Shippers see inquiries on their shipments
