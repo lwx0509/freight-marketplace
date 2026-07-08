@@ -185,12 +185,25 @@
                     <div class="section">
                         <h3>List a New Shipment</h3>
                         <form onsubmit="app.handleCreateShipment(event)">
-                            <input type="text" id="shipmentOrigin" placeholder="Origin City" required>
-                            <input type="text" id="shipmentDestination" placeholder="Destination City" required>
+                            <div class="field-group">
+                                <label class="field-label">Origin</label>
+                                <div class="field-row">
+                                    <input type="text" id="shipmentOriginCity" placeholder="City" required>
+                                    <input type="text" id="shipmentOriginState" placeholder="State / Province" required>
+                                </div>
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label">Destination</label>
+                                <div class="field-row">
+                                    <input type="text" id="shipmentDestCity" placeholder="City" required>
+                                    <input type="text" id="shipmentDestState" placeholder="State / Province" required>
+                                </div>
+                            </div>
                             <input type="text" id="shipmentCargoType" placeholder="Cargo Type (e.g., Perishable, Hazmat)" required>
                             <input type="number" id="shipmentWeight" placeholder="Weight (tons)" step="0.1">
                             <input type="number" id="shipmentBudget" placeholder="Budget (USD)" step="0.01">
                             <input type="date" id="shipmentDate" placeholder="Shipping Date">
+                            <script>document.getElementById('shipmentDate').min = new Date().toISOString().slice(0, 10);</script>
                             <textarea id="shipmentNotes" placeholder="Additional details..."></textarea>
                             <button type="submit" class="btn-primary btn-block">Post Shipment</button>
                         </form>

@@ -309,6 +309,17 @@ class FreightHandler(BaseHTTPRequestHandler):
             conn.close()
             return
 
+        if shipping_date:
+            try:
+                if datetime.strptime(shipping_date, '%Y-%m-%d').date() < datetime.utcnow().date():
+                    self.json_response({'error': 'Shipping date cannot be in the past'}, 400)
+                    conn.close()
+                    return
+            except ValueError:
+                self.json_response({'error': 'Invalid shipping date format (expected YYYY-MM-DD)'}, 400)
+                conn.close()
+                return
+
         conn.execute(
             'INSERT INTO shipments (shipper_id, origin, destination, cargo_type, weight_tons, budget, shipping_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             (user_id, origin, destination, cargo_type, weight_tons, budget, shipping_date, notes)

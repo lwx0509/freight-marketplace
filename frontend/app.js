@@ -239,9 +239,18 @@ const app = {
     async handleCreateShipment(event) {
         event.preventDefault();
 
+        const dateVal = document.getElementById('shipmentDate').value;
+        if (dateVal) {
+            const today = new Date().toISOString().slice(0, 10);
+            if (dateVal < today) {
+                alert('Shipping date cannot be in the past');
+                return;
+            }
+        }
+
         const payload = {
-            origin: document.getElementById('shipmentOrigin').value,
-            destination: document.getElementById('shipmentDestination').value,
+            origin: document.getElementById('shipmentOriginCity').value.trim() + ', ' + document.getElementById('shipmentOriginState').value.trim(),
+            destination: document.getElementById('shipmentDestCity').value.trim() + ', ' + document.getElementById('shipmentDestState').value.trim(),
             cargo_type: document.getElementById('shipmentCargoType').value,
             weight_tons: parseFloat(document.getElementById('shipmentWeight').value) || null,
             budget: parseFloat(document.getElementById('shipmentBudget').value) || null,

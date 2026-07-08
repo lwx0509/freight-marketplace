@@ -613,3 +613,29 @@ textarea {
     border-left: 2px solid #f97316;
     padding: 10px 14px;
 }
+
+
+/* Location field groups (shipper dashboard) */
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+}
+
+.field-row {
+    display: flex;
+    gap: 10px;
+}
+
+.field-row input {
+    flex: 1;
+    min-width: 0;
+}
