@@ -320,9 +320,16 @@ textarea {
     transition: opacity 1.8s ease-in-out;
 }
 
-.hero-cinema .scene.active {
+/* Outgoing scene: stays fully visible underneath while the new one fades in on top */
+.hero-cinema .scene.prev {
     opacity: 1;
     z-index: 1;
+    transition: none;
+}
+
+.hero-cinema .scene.active {
+    opacity: 1;
+    z-index: 2;
     pointer-events: auto;
 }
 

@@ -76,9 +76,12 @@
                 var scenes = document.querySelectorAll('#heroCinema .scene');
                 var i = 0;
                 setInterval(function () {
-                    scenes[i].classList.remove('active');
+                    var old = scenes[i];
+                    old.classList.remove('active');
+                    old.classList.add('prev');
                     i = (i + 1) % scenes.length;
                     scenes[i].classList.add('active');
+                    setTimeout(function () { old.classList.remove('prev'); }, 1900);
                 }, 7000);
             })();
             </script>
