@@ -602,3 +602,14 @@ textarea {
         padding: 32px 24px;
     }
 }
+
+
+.role-note {
+    margin-top: 26px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #cbd5e1;
+    background: rgba(249,115,22,0.08);
+    border-left: 2px solid #f97316;
+    padding: 10px 14px;
+}
