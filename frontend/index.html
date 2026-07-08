@@ -20,16 +20,68 @@
                 </div>
             </nav>
 
-            <section class="hero">
-                <div class="container">
-                    <h2>International Specialty Freight Made Simple</h2>
-                    <p>Connect shippers with verified shipping companies in one marketplace</p>
-                    <div class="hero-buttons">
-                        <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I'm a Shipper</button>
-                        <button class="btn-secondary btn-large" onclick="app.showSignup('company')">I'm a Shipping Company</button>
+            <section class="hero hero-cinema" id="heroCinema">
+                <!-- Scene 1: Global Trade Never Sleeps -->
+                <div class="scene active" data-scene="1">
+                    <div class="scene-bg" style="background-image:url('/images/container_ship.jpg')"></div>
+                    <div class="scene-content">
+                        <h2 class="scene-display">Global Trade</h2>
+                        <h2 class="scene-display scene-orange">Never Sleeps</h2>
+                        <div class="scene-tag"><span class="tag-line"></span>Scale without limits<span class="tag-line"></span></div>
                     </div>
                 </div>
+                <!-- Scene 2: Logistics is broken -->
+                <div class="scene" data-scene="2">
+                    <div class="scene-bg" style="background-image:url('/images/port.jpg')"></div>
+                    <div class="scene-content">
+                        <div class="scene-badge scene-badge-red">The old way</div>
+                        <h2 class="scene-display scene-md">Logistics.<br>Buried in middlemen.</h2>
+                    </div>
+                </div>
+                <!-- Scene 3: No middlemen -->
+                <div class="scene" data-scene="3">
+                    <div class="scene-bg" style="background-image:url('/images/globe.jpg')"></div>
+                    <div class="scene-content">
+                        <div class="scene-badge">The FreightLink way</div>
+                        <h2 class="scene-display scene-md">No middlemen.<br>Total clarity.</h2>
+                    </div>
+                </div>
+                <!-- Scene 4: Zero Friction -->
+                <div class="scene" data-scene="4">
+                    <div class="scene-content">
+                        <h2 class="scene-display">Zero Friction.</h2>
+                        <div class="scene-tag">Shippers ↔ Verified Carriers. Direct.</div>
+                    </div>
+                </div>
+                <!-- Scene 5: Outro -->
+                <div class="scene" data-scene="5">
+                    <div class="scene-glow"></div>
+                    <div class="scene-content">
+                        <div class="scene-logo-row"><span class="scene-diamond"></span>
+                            <h2 class="scene-display">FreightLink</h2>
+                        </div>
+                        <div class="scene-tag">Clarity in Global Logistics</div>
+                    </div>
+                    <span class="frame-mark fm-tl"></span><span class="frame-mark fm-tr"></span>
+                    <span class="frame-mark fm-bl"></span><span class="frame-mark fm-br"></span>
+                </div>
+                <!-- Persistent CTA -->
+                <div class="hero-cta">
+                    <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I'm a Shipper</button>
+                    <button class="btn-secondary btn-large btn-on-dark" onclick="app.showSignup('company')">I'm a Shipping Company</button>
+                </div>
             </section>
+            <script>
+            (function () {
+                var scenes = document.querySelectorAll('#heroCinema .scene');
+                var i = 0;
+                setInterval(function () {
+                    scenes[i].classList.remove('active');
+                    i = (i + 1) % scenes.length;
+                    scenes[i].classList.add('active');
+                }, 6000);
+            })();
+            </script>
 
             <section class="features">
                 <div class="container">

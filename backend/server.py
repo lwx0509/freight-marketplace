@@ -97,6 +97,9 @@ class FreightHandler(BaseHTTPRequestHandler):
             self.serve_static(os.path.join(FRONTEND_DIR, path.lstrip('/')), 'application/javascript')
         elif path.endswith('.css'):
             self.serve_static(os.path.join(FRONTEND_DIR, path.lstrip('/')), 'text/css')
+        elif path.startswith('/images/'):
+            content_type = mimetypes.guess_type(path)[0] or 'application/octet-stream'
+            self.serve_static(os.path.join(FRONTEND_DIR, path.lstrip('/')), content_type)
         elif path.startswith('/api/'):
             self.handle_api_get(path)
         else:
