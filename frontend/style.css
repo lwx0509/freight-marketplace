@@ -342,7 +342,8 @@ textarea {
     filter: grayscale(60%);
 }
 
-.scene.active .scene-bg {
+.scene.active .scene-bg,
+.scene.prev .scene-bg {
     animation: kenburns 16s linear forwards;
 }
 
