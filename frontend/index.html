@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freight Marketplace - Connect Shippers & Shipping Companies</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Landing Page -->
+        <div id="landingPage" class="page">
+            <nav class="navbar">
+                <div class="container">
+                    <h1 class="logo">FreightLink</h1>
+                    <div class="nav-buttons">
+                        <button class="btn-secondary" onclick="app.showPage('loginPage')">Login</button>
+                        <button class="btn-primary" onclick="app.showPage('signupPage')">Sign Up</button>
+                    </div>
+                </div>
+            </nav>
+
+            <section class="hero">
+                <div class="container">
+                    <h2>International Specialty Freight Made Simple</h2>
+                    <p>Connect shippers with verified shipping companies in one marketplace</p>
+                    <div class="hero-buttons">
+                        <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I'm a Shipper</button>
+                        <button class="btn-secondary btn-large" onclick="app.showSignup('company')">I'm a Shipping Company</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="features">
+                <div class="container">
+                    <h3>How It Works</h3>
+                    <div class="feature-grid">
+                        <div class="feature">
+                            <h4>Shippers</h4>
+                            <p>📋 List your shipments for free<br>💰 Pay $10 for 15-day access to browse companies<br>📞 Connect directly with verified carriers</p>
+                        </div>
+                        <div class="feature">
+                            <h4>Shipping Companies</h4>
+                            <p>🔍 Browse all active shipments<br>💼 $50/month for unlimited access<br>📧 Direct contact with shippers</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Signup Page -->
+        <div id="signupPage" class="page hidden">
+            <nav class="navbar">
+                <div class="container">
+                    <h1 class="logo">FreightLink</h1>
+                    <button class="btn-link" onclick="app.showPage('landingPage')">← Back</button>
+                </div>
+            </nav>
+
+            <div class="container form-container">
+                <h2>Create Account</h2>
+                <form onsubmit="app.handleSignup(event)">
+                    <input type="email" id="signupEmail" placeholder="Email" required>
+                    <input type="text" id="signupName" placeholder="Full Name" required>
+                    <input type="password" id="signupPassword" placeholder="Password" required>
+
+                    <div id="companyNameField" style="display: none;">
+                        <input type="text" id="signupCompanyName" placeholder="Company Name">
+                    </div>
+
+                    <input type="hidden" id="signupUserType" value="shipper">
+
+                    <button type="submit" class="btn-primary btn-block">Create Account</button>
+                    <p class="error" id="signupError"></p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="loginPage" class="page hidden">
+            <nav class="navbar">
+                <div class="container">
+                    <h1 class="logo">FreightLink</h1>
+                    <button class="btn-link" onclick="app.showPage('landingPage')">← Back</button>
+                </div>
+            </nav>
+
+            <div class="container form-container">
+                <h2>Login</h2>
+                <form onsubmit="app.handleLogin(event)">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <button type="submit" class="btn-primary btn-block">Login</button>
+                    <p class="error" id="loginError"></p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard Page (after login) -->
+        <div id="dashboardPage" class="page hidden">
+            <nav class="navbar">
+                <div class="container">
+                    <h1 class="logo">FreightLink</h1>
+                    <div class="nav-buttons">
+                        <span id="userDisplay"></span>
+                        <button class="btn-secondary" onclick="app.logout()">Logout</button>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container">
+                <div id="shipperDashboard" class="dashboard hidden">
+                    <h2>Shipper Dashboard</h2>
+
+                    <div class="section">
+                        <h3>List a New Shipment</h3>
+                        <form onsubmit="app.handleCreateShipment(event)">
+                            <input type="text" id="shipmentOrigin" placeholder="Origin City" required>
+                            <input type="text" id="shipmentDestination" placeholder="Destination City" required>
+                            <input type="text" id="shipmentCargoType" placeholder="Cargo Type (e.g., Perishable, Hazmat)" required>
+                            <input type="number" id="shipmentWeight" placeholder="Weight (tons)" step="0.1">
+                            <input type="number" id="shipmentBudget" placeholder="Budget (USD)" step="0.01">
+                            <input type="date" id="shipmentDate" placeholder="Shipping Date">
+                            <textarea id="shipmentNotes" placeholder="Additional details..."></textarea>
+                            <button type="submit" class="btn-primary btn-block">Post Shipment</button>
+                        </form>
+                    </div>
+
+                    <div class="section">
+                        <h3>Your Shipments</h3>
+                        <div id="shipmentsList"></div>
+                    </div>
+
+                    <div class="section">
+                        <h3>Browse Shipping Companies</h3>
+                        <p id="accessStatus"></p>
+                        <button id="buyAccessBtn" class="btn-primary" onclick="app.buyShipperAccess()" style="display: none;">Buy 15-Day Access ($10)</button>
+                        <div id="companiesList" style="display: none;"></div>
+                    </div>
+
+                    <div class="section">
+                        <h3>Inquiries</h3>
+                        <div id="shipperInquiriesList"></div>
+                    </div>
+                </div>
+
+                <div id="companyDashboard" class="dashboard hidden">
+                    <h2>Shipping Company Dashboard</h2>
+
+                    <div class="section">
+                        <h3>Subscription Status</h3>
+                        <p id="subscriptionStatus"></p>
+                        <button id="renewSubscriptionBtn" class="btn-primary" onclick="app.renewCompanySubscription()" style="display: none;">Renew Subscription ($50)</button>
+                    </div>
+
+                    <div class="section">
+                        <h3>Available Shipments</h3>
+                        <div id="availableShipmentsList"></div>
+                    </div>
+
+                    <div class="section">
+                        <h3>My Inquiries</h3>
+                        <div id="companyInquiriesList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>

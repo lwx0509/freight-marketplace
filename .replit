@@ -1,0 +1,5 @@
+run = "python3 backend/server.py"
+modules = ["python-3.10"]
+
+[nix]
+channel = "stable-22.11"
