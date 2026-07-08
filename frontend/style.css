@@ -508,3 +508,96 @@ textarea {
         animation: none;
     }
 }
+
+
+/* ===== Signup: role info panel + form ===== */
+.signup-card {
+    display: flex;
+    max-width: 900px;
+    margin: 60px auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+}
+
+.signup-info {
+    flex: 1 1 44%;
+    background: #0b0e14;
+    color: #f4f6fa;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-image: radial-gradient(circle at 20% 20%, rgba(249,115,22,0.15) 0%, transparent 60%);
+}
+
+.role-kicker {
+    font-family: 'SF Mono', ui-monospace, Menlo, monospace;
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #f97316;
+    margin-bottom: 12px;
+}
+
+.signup-info h3 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+}
+
+.role-steps {
+    list-style: none;
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.role-steps li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 52px;
+}
+
+.role-steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-family: 'SF Mono', ui-monospace, Menlo, monospace;
+    font-size: 14px;
+    color: #f97316;
+    border: 1px solid rgba(249,115,22,0.4);
+    padding: 4px 7px;
+}
+
+.role-steps li strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.role-steps li span {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #9aa4b2;
+}
+
+.signup-card .signup-form {
+    flex: 1 1 56%;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+@media (max-width: 768px) {
+    .signup-card {
+        flex-direction: column;
+        margin: 20px auto;
+    }
+    .signup-info {
+        padding: 32px 24px;
+    }
+}

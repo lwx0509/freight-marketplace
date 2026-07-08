@@ -15,7 +15,7 @@
                     <h1 class="logo">FreightLink</h1>
                     <div class="nav-buttons">
                         <button class="btn-secondary" onclick="app.showPage('loginPage')">Login</button>
-                        <button class="btn-primary" onclick="app.showPage('signupPage')">Sign Up</button>
+                        <button class="btn-primary" onclick="app.showSignup('shipper')">Sign Up</button>
                     </div>
                 </div>
             </nav>
@@ -86,21 +86,6 @@
             })();
             </script>
 
-            <section class="features">
-                <div class="container">
-                    <h3>How It Works</h3>
-                    <div class="feature-grid">
-                        <div class="feature">
-                            <h4>Shippers</h4>
-                            <p>📋 List your shipments for free<br>💰 Pay $10 for 15-day access to browse companies<br>📞 Connect directly with verified carriers</p>
-                        </div>
-                        <div class="feature">
-                            <h4>Shipping Companies</h4>
-                            <p>🔍 Browse all active shipments<br>💼 $50/month for unlimited access<br>📧 Direct contact with shippers</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
 
         <!-- Signup Page -->
@@ -112,8 +97,29 @@
                 </div>
             </nav>
 
-            <div class="container form-container">
-                <h2>Create Account</h2>
+            <div class="container signup-card">
+                <aside class="signup-info">
+                    <div id="shipperInfo" class="role-info">
+                        <div class="role-kicker">How it works</div>
+                        <h3>For Shippers</h3>
+                        <ol class="role-steps">
+                            <li><strong>List shipments free</strong><span>Post your cargo, route, and budget in minutes.</span></li>
+                            <li><strong>Unlock the directory</strong><span>$10 gets you 15-day access to browse verified companies.</span></li>
+                            <li><strong>Connect directly</strong><span>Talk to carriers one-on-one. No middlemen.</span></li>
+                        </ol>
+                    </div>
+                    <div id="companyInfo" class="role-info" style="display: none;">
+                        <div class="role-kicker">How it works</div>
+                        <h3>For Shipping Companies</h3>
+                        <ol class="role-steps">
+                            <li><strong>Browse all shipments</strong><span>See every active listing the moment it posts.</span></li>
+                            <li><strong>One flat rate</strong><span>$50/month for unlimited access and inquiries.</span></li>
+                            <li><strong>Win business directly</strong><span>Contact shippers without brokers in between.</span></li>
+                        </ol>
+                    </div>
+                </aside>
+                <div class="form-container signup-form">
+                <h2 id="signupTitle">Create Account</h2>
                 <form onsubmit="app.handleSignup(event)">
                     <input type="email" id="signupEmail" placeholder="Email" required>
                     <input type="text" id="signupName" placeholder="Full Name" required>
@@ -128,6 +134,7 @@
                     <button type="submit" class="btn-primary btn-block">Create Account</button>
                     <p class="error" id="signupError"></p>
                 </form>
+                </div>
             </div>
         </div>
 

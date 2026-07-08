@@ -30,14 +30,14 @@ const app = {
         document.getElementById('signupUserType').value = userType;
         const field = document.getElementById('companyNameField');
         const input = document.getElementById('signupCompanyName');
+        const isCompany = userType === 'company';
 
-        if (userType === 'company') {
-            field.style.display = 'block';
-            input.required = true;
-        } else {
-            field.style.display = 'none';
-            input.required = false;
-        }
+        field.style.display = isCompany ? 'block' : 'none';
+        input.required = isCompany;
+
+        document.getElementById('shipperInfo').style.display = isCompany ? 'none' : 'block';
+        document.getElementById('companyInfo').style.display = isCompany ? 'block' : 'none';
+        document.getElementById('signupTitle').textContent = isCompany ? 'Sign Up as a Shipping Company' : 'Sign Up as a Shipper';
 
         this.showPage('signupPage');
     },
