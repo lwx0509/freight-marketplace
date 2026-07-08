@@ -22,7 +22,7 @@
 
             <section class="hero hero-cinema" id="heroCinema">
                 <!-- Scene 1: Global Trade Never Sleeps -->
-                <div class="scene active" data-scene="1">
+                <div class="scene active" data-scene="1" data-duration="8500">
                     <div class="scene-bg" style="background-image:url('/images/container_ship.jpg')"></div>
                     <div class="scene-content">
                         <h2 class="scene-display">Global Trade</h2>
@@ -31,7 +31,7 @@
                     </div>
                 </div>
                 <!-- Scene 2: Logistics is broken -->
-                <div class="scene" data-scene="2">
+                <div class="scene" data-scene="2" data-duration="7500">
                     <div class="scene-bg" style="background-image:url('/images/port.jpg')"></div>
                     <div class="scene-content">
                         <div class="scene-badge scene-badge-red">The old way</div>
@@ -39,7 +39,7 @@
                     </div>
                 </div>
                 <!-- Scene 3: No middlemen -->
-                <div class="scene" data-scene="3">
+                <div class="scene" data-scene="3" data-duration="7500">
                     <div class="scene-bg" style="background-image:url('/images/globe.jpg')"></div>
                     <div class="scene-content">
                         <div class="scene-badge">The FreightLink way</div>
@@ -47,14 +47,14 @@
                     </div>
                 </div>
                 <!-- Scene 4: Zero Friction -->
-                <div class="scene" data-scene="4">
+                <div class="scene" data-scene="4" data-duration="5500">
                     <div class="scene-content">
                         <h2 class="scene-display">Zero Friction.</h2>
                         <div class="scene-tag">Shippers ↔ Verified Carriers. Direct.</div>
                     </div>
                 </div>
                 <!-- Scene 5: Outro -->
-                <div class="scene" data-scene="5">
+                <div class="scene" data-scene="5" data-duration="8000">
                     <div class="scene-glow"></div>
                     <div class="scene-content">
                         <div class="scene-logo-row"><span class="scene-diamond"></span>
@@ -75,14 +75,20 @@
             (function () {
                 var scenes = document.querySelectorAll('#heroCinema .scene');
                 var i = 0;
-                setInterval(function () {
+                function next() {
                     var old = scenes[i];
                     old.classList.remove('active');
                     old.classList.add('prev');
                     i = (i + 1) % scenes.length;
                     scenes[i].classList.add('active');
                     setTimeout(function () { old.classList.remove('prev'); }, 1900);
-                }, 7000);
+                    schedule();
+                }
+                function schedule() {
+                    var dur = parseInt(scenes[i].dataset.duration, 10) || 7000;
+                    setTimeout(next, dur);
+                }
+                schedule();
             })();
             </script>
 
