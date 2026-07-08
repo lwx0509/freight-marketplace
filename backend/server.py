@@ -22,7 +22,7 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 DB_PATH = os.path.join(SCRIPT_DIR, 'freight.db')
 SCHEMA_PATH = os.path.join(SCRIPT_DIR, 'schema.sql')
 FRONTEND_DIR = os.path.join(PROJECT_ROOT, 'frontend')
-PORT = 8000
+PORT = int(os.getenv('PORT', 8000))  # Railway sets PORT env var
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')  # Set in production
 
 # ========== Database Setup ==========
