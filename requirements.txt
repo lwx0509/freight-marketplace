@@ -1,0 +1,2 @@
+# No external dependencies — stdlib only.
+# This file exists so Railway/Railpack detects a Python app.
