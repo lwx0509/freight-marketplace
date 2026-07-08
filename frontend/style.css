@@ -311,6 +311,7 @@ textarea {
 .hero-cinema .scene {
     position: absolute;
     inset: 0;
+    background: #0b0e14;
     display: flex;
     align-items: center;
     justify-content: center;
