@@ -455,6 +455,25 @@ const app = {
         });
     },
 
+    // Filter table rows by a text search plus any number of facet selects.
+    // facets: [{ selectId, attr }] where attr is a data-* key on each <tr>.
+    filterRows(searchId, tbodyId, facets) {
+        const searchEl = document.getElementById(searchId);
+        const q = (searchEl ? searchEl.value : '').toLowerCase();
+        const fac = (facets || []).map(f => {
+            const el = document.getElementById(f.selectId);
+            return { val: el ? el.value : 'all', attr: f.attr };
+        });
+        document.getElementById(tbodyId).querySelectorAll('tr').forEach(r => {
+            if (r.children.length <= 1) return;
+            let show = r.textContent.toLowerCase().includes(q);
+            for (const f of fac) {
+                if (show && f.val !== 'all' && (r.dataset[f.attr] || '') !== f.val) show = false;
+            }
+            r.style.display = show ? '' : 'none';
+        });
+    },
+
     async loadAdminCarriers() {
         if (!this.token) return;
         try {
@@ -580,7 +599,7 @@ const app = {
         const esc = this.esc;
         const weight = (s.weight_tons != null && s.weight_tons !== '') ? esc(s.weight_tons) + ' t' : '—';
         const budget = (s.budget != null && s.budget !== '') ? '$' + esc(s.budget) : '—';
-        return `<tr>
+        return `<tr data-status="${esc(s.status || '')}">
             <td>${esc(s.origin)} → ${esc(s.destination)}</td>
             <td>${esc(s.cargo_type)}</td>
             <td data-sort="${s.weight_tons || 0}">${weight}</td>
@@ -689,19 +708,44 @@ const app = {
         }
 
         this._carriers = companies || [];
+        this.populateCarrierFacets(this._carriers);
         this.applyCarrierFilter();
+    },
+
+    populateCarrierFacets(list) {
+        const fill = (id, values, label) => {
+            const sel = document.getElementById(id);
+            if (!sel) return;
+            const current = sel.value;
+            sel.innerHTML = ['<option value="all">' + label + '</option>']
+                .concat(values.map(v => `<option value="${this.esc(v)}">${this.esc(v)}</option>`)).join('');
+            if (values.indexOf(current) !== -1) sel.value = current;
+        };
+        const uniq = (key) => Array.from(new Set(list.map(c => c[key]).filter(Boolean))).sort();
+        fill('carrierDirType', uniq('carrier_type'), 'All types');
+        fill('carrierDirCountry', uniq('country'), 'All countries');
     },
 
     applyCarrierFilter() {
         const list = this._carriers || [];
+        const val = (id) => { const el = document.getElementById(id); return el ? el.value : 'all'; };
         const searchEl = document.getElementById('carrierDirSearch');
-        const sortEl = document.getElementById('carrierDirSort');
         const q = (searchEl ? searchEl.value : '').toLowerCase();
-        const sort = sortEl ? sortEl.value : 'name';
+        const sort = val('carrierDirSort');
+        const fType = val('carrierDirType');
+        const fCountry = val('carrierDirCountry');
+        const fStatus = val('carrierDirStatus');
+        const hasContactEl = document.getElementById('carrierDirHasContact');
+        const hasContactOnly = hasContactEl ? hasContactEl.checked : false;
         let filtered = list.filter(c => {
             const hay = [c.company_name, c.trade_name, c.contact_name, c.city, c.state, c.country, c.carrier_type, c.status]
                 .filter(Boolean).join(' ').toLowerCase();
-            return hay.includes(q);
+            if (!hay.includes(q)) return false;
+            if (fType !== 'all' && (c.carrier_type || '') !== fType) return false;
+            if (fCountry !== 'all' && (c.country || '') !== fCountry) return false;
+            if (fStatus !== 'all' && (c.status || '') !== fStatus) return false;
+            if (hasContactOnly && !c.has_contact) return false;
+            return true;
         });
         const keyf = {
             name: c => (c.company_name || 'zzzz'),
@@ -810,16 +854,17 @@ const app = {
     renderShipperInquiries(inquiries) {
         const body = document.getElementById('shipperInquiriesBody');
         if (!inquiries.length) {
-            body.innerHTML = '<tr><td colspan="4">No inquiries yet.</td></tr>';
+            body.innerHTML = '<tr><td colspan="5">No inquiries yet.</td></tr>';
             return;
         }
         const esc = this.esc;
         body.innerHTML = inquiries.map(i => {
             const disp = i.created_at ? new Date(i.created_at).toLocaleString() : '—';
-            return `<tr>
+            return `<tr data-status="${esc(i.status || '')}">
                 <td>${esc(i.origin)} → ${esc(i.destination)}</td>
                 <td>${esc(i.company_name)}</td>
                 <td>${esc(i.message) || 'No message'}</td>
+                <td>${esc(i.status) || '—'}</td>
                 <td data-sort="${esc(i.created_at || '')}">${esc(disp)}</td>
             </tr>`;
         }).join('');

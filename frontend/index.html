@@ -509,7 +509,15 @@
                     <div class="dash-panel" id="dpShip" style="display: none;">
                         <div class="section">
                             <h3>Your shipments</h3>
-                            <input type="text" class="admin-search" id="shipmentSearch" placeholder="Search shipments…" oninput="app.filterTable('shipmentSearch', 'shipmentsBody')">
+                            <div class="filter-row">
+                                <input type="text" class="admin-search" id="shipmentSearch" placeholder="Search shipments…" oninput="app.filterRows('shipmentSearch','shipmentsBody',[{selectId:'shipmentStatus',attr:'status'}])">
+                                <select class="admin-select" id="shipmentStatus" onchange="app.filterRows('shipmentSearch','shipmentsBody',[{selectId:'shipmentStatus',attr:'status'}])">
+                                    <option value="all">Any status</option>
+                                    <option value="active">Active</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
                             <div class="admin-table-wrap">
                                 <table class="admin-table sortable">
                                     <thead>
@@ -533,6 +541,14 @@
                             <h3>Browse carriers</h3>
                             <div class="filter-row">
                                 <input type="text" class="admin-search" id="carrierDirSearch" placeholder="Search carriers…" oninput="app.applyCarrierFilter()">
+                                <select class="admin-select" id="carrierDirType" onchange="app.applyCarrierFilter()"><option value="all">All types</option></select>
+                                <select class="admin-select" id="carrierDirCountry" onchange="app.applyCarrierFilter()"><option value="all">All countries</option></select>
+                                <select class="admin-select" id="carrierDirStatus" onchange="app.applyCarrierFilter()">
+                                    <option value="all">Any status</option>
+                                    <option value="verified">Confirmed</option>
+                                    <option value="pending">Pending confirmation</option>
+                                </select>
+                                <label class="filter-check"><input type="checkbox" id="carrierDirHasContact" onchange="app.applyCarrierFilter()"> Has contact info</label>
                                 <select class="admin-select" id="carrierDirSort" onchange="app.applyCarrierFilter()">
                                     <option value="name">Sort by name</option>
                                     <option value="location">Sort by location</option>
@@ -547,7 +563,15 @@
                     <div class="dash-panel" id="dpInquiries" style="display: none;">
                         <div class="section">
                             <h3>Inquiries</h3>
-                            <input type="text" class="admin-search" id="inquirySearch" placeholder="Search inquiries…" oninput="app.filterTable('inquirySearch', 'shipperInquiriesBody')">
+                            <div class="filter-row">
+                                <input type="text" class="admin-search" id="inquirySearch" placeholder="Search inquiries…" oninput="app.filterRows('inquirySearch','shipperInquiriesBody',[{selectId:'inquiryStatus',attr:'status'}])">
+                                <select class="admin-select" id="inquiryStatus" onchange="app.filterRows('inquirySearch','shipperInquiriesBody',[{selectId:'inquiryStatus',attr:'status'}])">
+                                    <option value="all">Any status</option>
+                                    <option value="new">New</option>
+                                    <option value="viewed">Viewed</option>
+                                    <option value="replied">Replied</option>
+                                </select>
+                            </div>
                             <div class="admin-table-wrap">
                                 <table class="admin-table sortable">
                                     <thead>
@@ -555,6 +579,7 @@
                                             <th onclick="app.sortTable(this)">Route</th>
                                             <th onclick="app.sortTable(this)">From carrier</th>
                                             <th onclick="app.sortTable(this)">Message</th>
+                                            <th onclick="app.sortTable(this)">Status</th>
                                             <th onclick="app.sortTable(this)">Received</th>
                                         </tr>
                                     </thead>

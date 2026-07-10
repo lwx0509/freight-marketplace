@@ -812,6 +812,16 @@ textarea {
     cursor: pointer;
 }
 
+.filter-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #5a6474;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
 .admin-table.sortable th {
     cursor: pointer;
     user-select: none;

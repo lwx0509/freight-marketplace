@@ -521,9 +521,9 @@ class FreightHandler(BaseHTTPRequestHandler):
             return
 
         if user['user_type'] == 'shipper':
-            # Shippers see their own shipments
+            # Shippers see all of their own shipments (any status)
             shipments = conn.execute(
-                'SELECT * FROM shipments WHERE shipper_id = ? AND status = "active" ORDER BY created_at DESC',
+                'SELECT * FROM shipments WHERE shipper_id = ? ORDER BY created_at DESC',
                 (user_id,)
             ).fetchall()
         else:
@@ -560,6 +560,7 @@ class FreightHandler(BaseHTTPRequestHandler):
         result = []
         for c in carriers:
             # Location and carrier type are shown even while pending.
+            has_contact = bool((c['contact_name'] or '').strip() or (c['phone'] or '').strip())
             row = {
                 'id': c['id'],
                 'status': 'verified' if c['status'] == 'verified' else 'pending',
@@ -568,6 +569,7 @@ class FreightHandler(BaseHTTPRequestHandler):
                 'country': c['country'],
                 'carrier_type': c['carrier_type'],
                 'lanes': c['lanes'],
+                'has_contact': has_contact,
             }
             if c['status'] == 'verified':
                 # Confirmed carriers show their full details.
