@@ -29,9 +29,9 @@
                 <div class="hero-overlay"></div>
                 <div class="hero-inner">
                     <h2 class="hero-title">Skip the brokers.<br><span class="hero-title-accent">Ship cross-border direct.</span></h2>
-                    <p class="hero-sub">FreightLink connects shippers with verified international carriers &mdash; one&nbsp;on&nbsp;one. No middlemen marking up your freight, no black-box quotes.</p>
+                    <p class="hero-sub">FreightLink connects anyone shipping internationally with verified carriers &mdash; one&nbsp;on&nbsp;one. No middlemen marking up your freight, no black-box quotes.</p>
                     <div class="hero-actions">
-                        <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I have cargo to ship →</button>
+                        <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I need to ship something →</button>
                         <button class="btn-secondary btn-large btn-on-dark" onclick="app.showSignup('company')">I'm a shipping company</button>
                     </div>
                 </div>
@@ -48,6 +48,39 @@
                 }, 5000);
             })();
             </script>
+
+            <section class="paths-section">
+                <div class="container">
+                    <div class="paths-head">
+                        <div class="paths-eyebrow">Choose your side of the trade</div>
+                        <h2 class="paths-title">Two clear paths. Honest, flat pricing.</h2>
+                        <p class="paths-lead">No percentage cuts, no surprise fees. You always know exactly what you pay before you connect.</p>
+                    </div>
+                    <div class="paths-grid">
+                        <div class="path-card">
+                            <h3 class="path-card-title">For shippers</h3>
+                            <div class="path-price"><span class="path-price-big">$1</span> to list your first shipment</div>
+                            <ul class="path-steps">
+                                <li><strong>List for $1.</strong> Post your cargo, route, and budget in minutes — your first month live is covered.</li>
+                                <li><strong>Keep it live for $5/mo.</strong> Stay posted after the first month for a flat monthly rate.</li>
+                                <li><strong>Browse carriers for $10/mo.</strong> Unlock the full directory of verified carriers anytime.</li>
+                                <li><strong>Connect directly.</strong> Talk to carriers one on one — no middlemen.</li>
+                            </ul>
+                            <button class="btn-primary btn-block" onclick="app.showSignup('shipper')">I need to ship something →</button>
+                        </div>
+                        <div class="path-card">
+                            <h3 class="path-card-title">For shipping companies</h3>
+                            <div class="path-price"><span class="path-price-big">$50</span><span class="path-price-unit">/month</span> · unlimited access</div>
+                            <ul class="path-steps">
+                                <li><strong>See every listing live.</strong> New cross-border shipments appear the moment they post.</li>
+                                <li><strong>One flat rate.</strong> $50/month for unlimited browsing and inquiries — no per-lead fees.</li>
+                                <li><strong>Win business directly.</strong> Reach shippers with no broker in between.</li>
+                            </ul>
+                            <button class="btn-secondary btn-block" onclick="app.showSignup('company')">Start a carrier account →</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
         </div>
 
