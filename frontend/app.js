@@ -656,13 +656,12 @@ const app = {
     },
 
     async checkShipperAccess() {
-        // TODO: Check if shipper has valid access
-        // For now, show buy button
-        document.getElementById('buyAccessBtn').style.display = 'block';
-        document.getElementById('companiesList').style.display = 'none';
-        document.getElementById('accessStatus').textContent = 'You need access to browse carriers.';
+        // TODO: enforce real access once payments are wired up.
+        document.getElementById('buyAccessBtn').style.display = 'inline-flex';
+        document.getElementById('accessStatus').textContent =
+            "You don't have active directory access yet. Full access is $10/month.";
 
-        // TODO: Load companies list if they have access
+        // Directory currently loads regardless (gate not enforced yet).
         try {
             const res = await fetch(`${this.apiUrl}/api/companies`, {
                 headers: { 'Authorization': `Bearer ${this.token}` }
@@ -683,14 +682,10 @@ const app = {
         if (!companies || companies.length === 0) {
             container.innerHTML = '<p>No carriers available yet.</p>';
             container.style.display = 'block';
-            document.getElementById('buyAccessBtn').style.display = 'none';
-            document.getElementById('accessStatus').textContent = 'Browse available carriers:';
             return;
         }
 
         this._carriers = companies || [];
-        document.getElementById('buyAccessBtn').style.display = 'none';
-        document.getElementById('accessStatus').textContent = 'Browse available carriers:';
         this.applyCarrierFilter();
     },
 
