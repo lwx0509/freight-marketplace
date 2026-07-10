@@ -711,6 +711,44 @@ textarea {
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
 }
 
+.howmodal-card-narrow {
+    max-width: 520px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d7deea;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #0b0e14;
+}
+
+.contact-form textarea {
+    resize: vertical;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    outline: none;
+    border-color: #0066cc;
+}
+
+.contact-note {
+    font-size: 14px;
+    color: #1d9e75;
+    margin-top: 4px;
+    min-height: 18px;
+}
+
 .howmodal-close {
     position: absolute;
     top: 16px;

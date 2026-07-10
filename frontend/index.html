@@ -15,7 +15,7 @@
                     <h1 class="logo">FreightLink</h1>
                     <div class="nav-buttons">
                         <button class="btn-secondary" onclick="app.showPage('loginPage')">Log in</button>
-                        <button class="btn-primary" onclick="app.showSignup('shipper')">Get started free</button>
+                        <button class="btn-primary" onclick="openContactModal()">Contact us</button>
                     </div>
                 </div>
             </nav>
@@ -116,6 +116,48 @@
             }
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') closeHowModal();
+            });
+            </script>
+
+            <div class="howmodal" id="contactModal" aria-hidden="true">
+                <div class="howmodal-backdrop" onclick="closeContactModal()"></div>
+                <div class="howmodal-card howmodal-card-narrow" role="dialog" aria-modal="true" aria-label="Contact us">
+                    <button class="howmodal-close" onclick="closeContactModal()" aria-label="Close">×</button>
+                    <div class="paths-head" style="margin-bottom: 24px;">
+                        <div class="paths-eyebrow">Contact us</div>
+                        <h2 class="paths-title">Get in touch</h2>
+                        <p class="paths-lead">Questions about FreightLink? Send us a message and we'll get back to you.</p>
+                    </div>
+                    <form class="contact-form" onsubmit="handleContactSubmit(event)">
+                        <input type="text" id="contactName" placeholder="Your name" required>
+                        <input type="email" id="contactEmail" placeholder="Email" required>
+                        <input type="text" id="contactCompany" placeholder="Company (optional)">
+                        <textarea id="contactMessage" placeholder="How can we help?" rows="5" required></textarea>
+                        <button type="submit" class="btn-primary btn-block">Send message</button>
+                        <p class="contact-note" id="contactNote"></p>
+                    </form>
+                </div>
+            </div>
+            <script>
+            function openContactModal() {
+                var m = document.getElementById('contactModal');
+                m.classList.add('open');
+                m.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeContactModal() {
+                var m = document.getElementById('contactModal');
+                m.classList.remove('open');
+                m.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+            }
+            function handleContactSubmit(e) {
+                e.preventDefault();
+                // TODO: wire this to Mailgun (or a backend /api/contact route) to actually send the message.
+                document.getElementById('contactNote').textContent = "Thanks! This form isn't connected to email yet — it's ready to hook up to Mailgun.";
+            }
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeContactModal();
             });
             </script>
 
