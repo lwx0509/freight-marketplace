@@ -219,6 +219,8 @@ class FreightHandler(BaseHTTPRequestHandler):
             self.admin_verify_carrier(data)
         elif path == '/api/claim':
             self.post_claim(data)
+        elif path == '/api/change-password':
+            self.change_password(data)
         else:
             self.json_response({'error': 'Not found'}, 404)
 
@@ -353,6 +355,34 @@ class FreightHandler(BaseHTTPRequestHandler):
             'company_name': user['company_name'],
             'is_admin': bool(user['is_admin'])
         })
+
+    def change_password(self, data):
+        """POST /api/change-password - change the logged-in user's password."""
+        user_id = verify_token(self.get_token())
+        if not user_id:
+            self.json_response({'error': 'Unauthorized'}, 401)
+            return
+
+        current = data.get('current_password', '')
+        new = data.get('new_password', '')
+        if not current or not new:
+            self.json_response({'error': 'Missing current or new password'}, 400)
+            return
+        if len(new) < 6:
+            self.json_response({'error': 'New password must be at least 6 characters'}, 400)
+            return
+
+        conn = get_db()
+        user = conn.execute('SELECT password_hash FROM users WHERE id = ?', (user_id,)).fetchone()
+        if not user or not verify_password(current, user['password_hash']):
+            conn.close()
+            self.json_response({'error': 'Current password is incorrect'}, 400)
+            return
+
+        conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (hash_password(new), user_id))
+        conn.commit()
+        conn.close()
+        self.json_response({'success': True})
 
     # ========== Shipment Endpoints ==========
     def create_shipment(self, data):

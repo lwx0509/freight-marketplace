@@ -396,6 +396,7 @@
                     <h1 class="logo">FreightLink <span class="admin-tag">Admin</span></h1>
                     <div class="nav-buttons">
                         <button class="btn-secondary" onclick="app.loadAdmin()">Refresh</button>
+                        <button class="btn-secondary" onclick="openChangePw()">Change password</button>
                         <button class="btn-secondary" onclick="app.logout()">Logout</button>
                     </div>
                 </div>
@@ -453,6 +454,7 @@
                     <h1 class="logo">FreightLink</h1>
                     <div class="nav-buttons">
                         <span id="userDisplay"></span>
+                        <button class="btn-secondary" onclick="openChangePw()">Change password</button>
                         <button class="btn-secondary" onclick="app.logout()">Logout</button>
                     </div>
                 </div>
@@ -529,6 +531,40 @@
             </div>
         </div>
     </div>
+
+    <div class="howmodal" id="changePwModal" aria-hidden="true">
+        <div class="howmodal-backdrop" onclick="closeChangePw()"></div>
+        <div class="howmodal-card howmodal-card-narrow" role="dialog" aria-modal="true" aria-label="Change password">
+            <button class="howmodal-close" onclick="closeChangePw()" aria-label="Close">×</button>
+            <div class="paths-head" style="margin-bottom: 20px;">
+                <div class="paths-eyebrow">Account</div>
+                <h2 class="paths-title">Change password</h2>
+            </div>
+            <form class="contact-form" onsubmit="app.submitChangePw(event)">
+                <input type="password" id="cpCurrent" placeholder="Current password" required>
+                <input type="password" id="cpNew" placeholder="New password (min 6 characters)" required>
+                <input type="password" id="cpConfirm" placeholder="Confirm new password" required>
+                <button type="submit" class="btn-primary btn-block">Update password</button>
+                <p class="contact-note" id="cpNote"></p>
+            </form>
+        </div>
+    </div>
+    <script>
+    function openChangePw() {
+        var m = document.getElementById('changePwModal');
+        m.classList.add('open');
+        m.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        var n = document.getElementById('cpNote'); if (n) n.textContent = '';
+    }
+    function closeChangePw() {
+        var m = document.getElementById('changePwModal');
+        m.classList.remove('open');
+        m.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeChangePw(); });
+    </script>
 
     <script src="/app.js"></script>
 </body>

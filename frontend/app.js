@@ -157,6 +157,32 @@ const app = {
         this.showPage('landingPage');
     },
 
+    async submitChangePw(event) {
+        event.preventDefault();
+        const note = document.getElementById('cpNote');
+        note.style.color = '#e24b4a';
+        const cur = document.getElementById('cpCurrent').value;
+        const nw = document.getElementById('cpNew').value;
+        const conf = document.getElementById('cpConfirm').value;
+        if (nw !== conf) { note.textContent = 'New passwords do not match.'; return; }
+        try {
+            const res = await fetch(`${this.apiUrl}/api/change-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+                body: JSON.stringify({ current_password: cur, new_password: nw })
+            });
+            const data = await res.json();
+            if (!res.ok) { note.textContent = data.error || 'Could not change password.'; return; }
+            note.style.color = '#1d9e75';
+            note.textContent = 'Password updated.';
+            document.getElementById('cpCurrent').value = '';
+            document.getElementById('cpNew').value = '';
+            document.getElementById('cpConfirm').value = '';
+        } catch (err) {
+            note.textContent = 'Network error';
+        }
+    },
+
     // ========== Carrier claim ==========
     async startClaim(token) {
         this.claimToken = token;
