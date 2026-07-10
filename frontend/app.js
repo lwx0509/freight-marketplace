@@ -37,7 +37,7 @@ const app = {
 
         document.getElementById('shipperInfo').style.display = isCompany ? 'none' : 'block';
         document.getElementById('companyInfo').style.display = isCompany ? 'block' : 'none';
-        document.getElementById('signupTitle').textContent = isCompany ? 'Sign Up as a Shipping Company' : 'Sign Up as a Shipper';
+        document.getElementById('signupTitle').textContent = isCompany ? 'Sign Up as a Carrier' : 'Sign Up as a Shipper';
 
         this.showPage('signupPage');
     },
@@ -290,7 +290,7 @@ const app = {
         // For now, show buy button
         document.getElementById('buyAccessBtn').style.display = 'block';
         document.getElementById('companiesList').style.display = 'none';
-        document.getElementById('accessStatus').textContent = 'You need access to browse shipping companies.';
+        document.getElementById('accessStatus').textContent = 'You need access to browse carriers.';
 
         // TODO: Load companies list if they have access
         try {
@@ -311,7 +311,7 @@ const app = {
         const container = document.getElementById('companiesList');
 
         if (companies.length === 0) {
-            container.innerHTML = '<p>No shipping companies available.</p>';
+            container.innerHTML = '<p>No carriers available.</p>';
             return;
         }
 
@@ -324,7 +324,7 @@ const app = {
 
         container.style.display = 'block';
         document.getElementById('buyAccessBtn').style.display = 'none';
-        document.getElementById('accessStatus').textContent = 'Browse available shipping companies:';
+        document.getElementById('accessStatus').textContent = 'Browse available carriers:';
     },
 
     buyShipperAccess() {
