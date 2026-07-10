@@ -397,39 +397,46 @@
             <div class="container">
                 <h2>Admin</h2>
 
-                <h3 class="admin-section-title">All users <span id="adminUsersCount" class="admin-count"></span></h3>
-                <div class="admin-table-wrap">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Type</th>
-                                <th>Company</th>
-                                <th>Admin</th>
-                                <th>Joined</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminUsersBody"></tbody>
-                    </table>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" id="tabCarriers" onclick="app.switchAdminTab('carriers')">Carriers <span id="adminCarriersCount" class="admin-count"></span></button>
+                    <button class="admin-tab" id="tabShippers" onclick="app.switchAdminTab('shippers')">Shippers <span id="adminShippersCount" class="admin-count"></span></button>
                 </div>
 
-                <h3 class="admin-section-title">Carrier directory <span id="adminCarriersCount" class="admin-count"></span></h3>
-                <div class="admin-table-wrap">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Company</th>
-                                <th>Contact</th>
-                                <th>Email</th>
-                                <th>Lanes</th>
-                                <th>Status</th>
-                                <th>Claim link</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminCarriersBody"></tbody>
-                    </table>
+                <div id="carriersPanel" class="admin-panel">
+                    <input type="text" class="admin-search" id="carrierSearch" placeholder="Search carriers…" oninput="app.filterTable('carrierSearch', 'adminCarriersBody')">
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Contact</th>
+                                    <th>Email</th>
+                                    <th>Lanes</th>
+                                    <th>Status</th>
+                                    <th>Claim link</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminCarriersBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="shippersPanel" class="admin-panel" style="display:none;">
+                    <input type="text" class="admin-search" id="shipperSearch" placeholder="Search shippers…" oninput="app.filterTable('shipperSearch', 'adminShippersBody')">
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Admin</th>
+                                    <th>Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminShippersBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

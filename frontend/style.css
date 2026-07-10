@@ -704,16 +704,53 @@ textarea {
     margin: 6px 0 18px;
 }
 
-.admin-section-title {
-    margin: 28px 0 12px;
-    font-size: 18px;
-    color: #0b0e14;
-}
-
 .admin-count {
     color: #8b96a8;
     font-weight: 400;
     font-size: 14px;
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 6px;
+    border-bottom: 1px solid #e3e8ef;
+    margin: 8px 0 18px;
+}
+
+.admin-tab {
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #5a6474;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+
+.admin-tab:hover {
+    color: #0b0e14;
+}
+
+.admin-tab.active {
+    color: #0066cc;
+    border-bottom-color: #0066cc;
+}
+
+.admin-search {
+    width: 100%;
+    max-width: 360px;
+    padding: 10px 14px;
+    border: 1px solid #d7deea;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.admin-search:focus {
+    outline: none;
+    border-color: #0066cc;
 }
 
 .admin-table-wrap {

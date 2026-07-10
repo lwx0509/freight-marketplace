@@ -291,41 +291,54 @@ const app = {
             });
             if (!res.ok) return;
             const data = await res.json();
-            this.renderAdminUsers(data.users || []);
+            this.renderAdminShippers(data.users || []);
         } catch (err) {
             console.error('Failed to load admin users:', err);
         }
     },
 
-    renderAdminUsers(users) {
+    renderAdminShippers(users) {
         const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, m => (
             { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
         ));
-        const body = document.getElementById('adminUsersBody');
-        const count = document.getElementById('adminUsersCount');
-        if (count) count.textContent = `(${users.length})`;
-        if (!users.length) {
-            body.innerHTML = '<tr><td colspan="6">No users yet.</td></tr>';
+        const shippers = users.filter(u => u.user_type === 'shipper');
+        const body = document.getElementById('adminShippersBody');
+        const count = document.getElementById('adminShippersCount');
+        if (count) count.textContent = `(${shippers.length})`;
+        if (!shippers.length) {
+            body.innerHTML = '<tr><td colspan="4">No shippers yet.</td></tr>';
             return;
         }
-        body.innerHTML = users.map(u => {
-            const type = u.user_type === 'company' ? 'Carrier' : 'Shipper';
+        body.innerHTML = shippers.map(u => {
             const admin = u.is_admin ? '<span class="company-badge company-badge--verified">Admin</span>' : '—';
             const joined = u.created_at ? esc(String(u.created_at).slice(0, 10)) : '—';
             return `<tr>
                 <td>${esc(u.name) || '—'}</td>
                 <td>${esc(u.email)}</td>
-                <td>${type}</td>
-                <td>${esc(u.company_name) || '—'}</td>
                 <td>${admin}</td>
                 <td>${joined}</td>
             </tr>`;
         }).join('');
     },
 
+    switchAdminTab(name) {
+        const isCarriers = name === 'carriers';
+        document.getElementById('carriersPanel').style.display = isCarriers ? 'block' : 'none';
+        document.getElementById('shippersPanel').style.display = isCarriers ? 'none' : 'block';
+        document.getElementById('tabCarriers').classList.toggle('active', isCarriers);
+        document.getElementById('tabShippers').classList.toggle('active', !isCarriers);
+    },
+
+    filterTable(inputId, tbodyId) {
+        const q = (document.getElementById(inputId).value || '').toLowerCase();
+        const rows = document.getElementById(tbodyId).querySelectorAll('tr');
+        rows.forEach(r => {
+            r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+        });
+    },
+
     async loadAdminCarriers() {
         if (!this.token) return;
-        const summary = document.getElementById('adminSummary');
         try {
             const res = await fetch(`${this.apiUrl}/api/admin/carriers`, {
                 headers: { 'Authorization': `Bearer ${this.token}` }
@@ -343,9 +356,9 @@ const app = {
             { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
         ));
         const body = document.getElementById('adminCarriersBody');
-        const summary = document.getElementById('adminSummary');
+        const count = document.getElementById('adminCarriersCount');
         const pending = carriers.filter(c => c.status === 'pending').length;
-        if (summary) summary.textContent = `${carriers.length} carriers · ${pending} pending`;
+        if (count) count.textContent = `(${carriers.length}${pending ? `, ${pending} pending` : ''})`;
 
         if (!carriers.length) {
             body.innerHTML = '<tr><td colspan="7">No carriers imported yet.</td></tr>';
