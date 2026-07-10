@@ -13,8 +13,13 @@ const app = {
         this.user = JSON.parse(localStorage.getItem('user') || 'null');
 
         if (this.token && this.user) {
-            this.showPage('dashboardPage');
-            this.loadDashboard();
+            if (this.user.is_admin) {
+                this.showPage('adminPage');
+                this.loadAdminCarriers();
+            } else {
+                this.showPage('dashboardPage');
+                this.loadDashboard();
+            }
         } else {
             this.showPage('landingPage');
         }
@@ -72,7 +77,7 @@ const app = {
             }
 
             this.token = data.token;
-            this.user = { id: data.user_id, email: data.email, user_type: data.user_type };
+            this.user = { id: data.user_id, email: data.email, user_type: data.user_type, is_admin: false };
 
             localStorage.setItem('token', this.token);
             localStorage.setItem('user', JSON.stringify(this.user));
@@ -109,13 +114,18 @@ const app = {
             }
 
             this.token = data.token;
-            this.user = { id: data.user_id, email: data.email, user_type: data.user_type };
+            this.user = { id: data.user_id, email: data.email, user_type: data.user_type, is_admin: !!data.is_admin };
 
             localStorage.setItem('token', this.token);
             localStorage.setItem('user', JSON.stringify(this.user));
 
-            this.showPage('dashboardPage');
-            this.loadDashboard();
+            if (this.user.is_admin) {
+                this.showPage('adminPage');
+                this.loadAdminCarriers();
+            } else {
+                this.showPage('dashboardPage');
+                this.loadDashboard();
+            }
         } catch (err) {
             errorEl.textContent = 'Network error';
             console.error(err);
@@ -189,6 +199,85 @@ const app = {
             // TODO: Check if company has active subscription
         } catch (err) {
             console.error('Failed to load company dashboard:', err);
+        }
+    },
+
+    // ========== Admin ==========
+    async loadAdminCarriers() {
+        if (!this.token) return;
+        const summary = document.getElementById('adminSummary');
+        try {
+            const res = await fetch(`${this.apiUrl}/api/admin/carriers`, {
+                headers: { 'Authorization': `Bearer ${this.token}` }
+            });
+            if (!res.ok) {
+                if (summary) summary.textContent = 'Admin access required.';
+                return;
+            }
+            const data = await res.json();
+            this.renderAdminCarriers(data.carriers || []);
+        } catch (err) {
+            console.error('Failed to load admin carriers:', err);
+        }
+    },
+
+    renderAdminCarriers(carriers) {
+        const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, m => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+        ));
+        const body = document.getElementById('adminCarriersBody');
+        const summary = document.getElementById('adminSummary');
+        const pending = carriers.filter(c => c.status === 'pending').length;
+        if (summary) summary.textContent = `${carriers.length} carriers · ${pending} pending`;
+
+        if (!carriers.length) {
+            body.innerHTML = '<tr><td colspan="7">No carriers imported yet.</td></tr>';
+            return;
+        }
+
+        const origin = window.location.origin;
+        body.innerHTML = carriers.map(c => {
+            const claim = c.claim_token ? `${origin}/claim?token=${encodeURIComponent(c.claim_token)}` : '';
+            const badge = c.status === 'verified'
+                ? '<span class="company-badge company-badge--verified">Verified</span>'
+                : '<span class="company-badge company-badge--pending">Pending</span>';
+            const action = c.status === 'pending'
+                ? `<button class="btn-primary btn-sm" onclick="app.verifyCarrier(${c.id}, 'verified')">Verify</button>`
+                : `<button class="btn-secondary btn-sm" onclick="app.verifyCarrier(${c.id}, 'pending')">Unverify</button>`;
+            const lanes = esc([c.lanes, c.country].filter(Boolean).join(' · ')) || '—';
+            const claimCell = claim
+                ? `<button class="btn-link btn-sm" onclick="app.copyText('${claim.replace(/'/g, "\\'")}', this)">Copy</button>`
+                : '—';
+            return `<tr>
+                <td>${esc(c.company_name)}</td>
+                <td>${esc(c.contact_name) || '—'}</td>
+                <td>${esc(c.email) || '—'}</td>
+                <td>${lanes}</td>
+                <td>${badge}</td>
+                <td>${claimCell}</td>
+                <td>${action}</td>
+            </tr>`;
+        }).join('');
+    },
+
+    async verifyCarrier(id, status) {
+        try {
+            const res = await fetch(`${this.apiUrl}/api/admin/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+                body: JSON.stringify({ carrier_id: id, status })
+            });
+            if (res.ok) this.loadAdminCarriers();
+        } catch (err) {
+            console.error('Failed to update carrier:', err);
+        }
+    },
+
+    copyText(text, btn) {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                if (btn) { const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1200); }
+            });
         }
     },
 

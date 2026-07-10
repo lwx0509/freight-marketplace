@@ -187,6 +187,8 @@ class FreightHandler(BaseHTTPRequestHandler):
             self.get_companies()
         elif path.startswith('/api/inquiries'):
             self.get_inquiries()
+        elif path == '/api/admin/carriers':
+            self.admin_list_carriers()
         else:
             self.json_response({'error': 'Not found'}, 404)
 
@@ -204,6 +206,8 @@ class FreightHandler(BaseHTTPRequestHandler):
             self.create_checkout(data)
         elif path == '/api/stripe-webhook':
             self.stripe_webhook(data)
+        elif path == '/api/admin/verify':
+            self.admin_verify_carrier(data)
         else:
             self.json_response({'error': 'Not found'}, 404)
 
@@ -267,7 +271,7 @@ class FreightHandler(BaseHTTPRequestHandler):
 
         conn = get_db()
         user = conn.execute(
-            'SELECT id, email, password_hash, user_type FROM users WHERE email = ?',
+            'SELECT id, email, password_hash, user_type, is_admin FROM users WHERE email = ?',
             (email,)
         ).fetchone()
         conn.close()
@@ -282,7 +286,8 @@ class FreightHandler(BaseHTTPRequestHandler):
             'user_id': user['id'],
             'email': user['email'],
             'token': token,
-            'user_type': user['user_type']
+            'user_type': user['user_type'],
+            'is_admin': bool(user['is_admin'])
         })
 
     def get_current_user(self):
@@ -296,7 +301,7 @@ class FreightHandler(BaseHTTPRequestHandler):
 
         conn = get_db()
         user = conn.execute(
-            'SELECT id, email, name, user_type, company_name FROM users WHERE id = ?',
+            'SELECT id, email, name, user_type, company_name, is_admin FROM users WHERE id = ?',
             (user_id,)
         ).fetchone()
         conn.close()
@@ -310,7 +315,8 @@ class FreightHandler(BaseHTTPRequestHandler):
             'email': user['email'],
             'name': user['name'],
             'user_type': user['user_type'],
-            'company_name': user['company_name']
+            'company_name': user['company_name'],
+            'is_admin': bool(user['is_admin'])
         })
 
     # ========== Shipment Endpoints ==========
@@ -521,6 +527,62 @@ class FreightHandler(BaseHTTPRequestHandler):
 
         result = [dict(i) for i in inquiries]
         self.json_response({'inquiries': result})
+
+    # ========== Admin Endpoints ==========
+    def require_admin(self):
+        """Return user_id if the caller is an admin, else None."""
+        user_id = verify_token(self.get_token())
+        if not user_id:
+            return None
+        conn = get_db()
+        row = conn.execute('SELECT is_admin FROM users WHERE id = ?', (user_id,)).fetchone()
+        conn.close()
+        return user_id if (row and row['is_admin']) else None
+
+    def admin_list_carriers(self):
+        """GET /api/admin/carriers - full carrier list (admin only)."""
+        if not self.require_admin():
+            self.json_response({'error': 'Forbidden'}, 403)
+            return
+
+        conn = get_db()
+        rows = conn.execute(
+            """SELECT id, company_name, contact_name, email, phone, country, lanes,
+                      fmc_id, status, claim_token, created_at, verified_at
+               FROM carriers
+               ORDER BY (status = 'pending') DESC, company_name COLLATE NOCASE"""
+        ).fetchall()
+        conn.close()
+        self.json_response({'carriers': [dict(r) for r in rows]})
+
+    def admin_verify_carrier(self, data):
+        """POST /api/admin/verify - flip a carrier's status (admin only)."""
+        if not self.require_admin():
+            self.json_response({'error': 'Forbidden'}, 403)
+            return
+
+        carrier_id = data.get('carrier_id')
+        status = data.get('status', 'verified')
+        if status not in ('verified', 'pending'):
+            status = 'verified'
+        if not carrier_id:
+            self.json_response({'error': 'Missing carrier_id'}, 400)
+            return
+
+        conn = get_db()
+        if status == 'verified':
+            conn.execute(
+                "UPDATE carriers SET status = 'verified', verified_at = datetime('now') WHERE id = ?",
+                (carrier_id,)
+            )
+        else:
+            conn.execute(
+                "UPDATE carriers SET status = 'pending', verified_at = NULL WHERE id = ?",
+                (carrier_id,)
+            )
+        conn.commit()
+        conn.close()
+        self.json_response({'success': True})
 
     # ========== Payment Endpoints (Stripe) ==========
     def create_checkout(self, data):

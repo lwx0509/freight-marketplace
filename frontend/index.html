@@ -356,6 +356,39 @@
             </div>
         </div>
 
+        <!-- Admin Page -->
+        <div id="adminPage" class="page hidden">
+            <nav class="navbar">
+                <div class="container">
+                    <h1 class="logo">FreightLink <span class="admin-tag">Admin</span></h1>
+                    <div class="nav-buttons">
+                        <button class="btn-secondary" onclick="app.loadAdminCarriers()">Refresh</button>
+                        <button class="btn-secondary" onclick="app.logout()">Logout</button>
+                    </div>
+                </div>
+            </nav>
+            <div class="container">
+                <h2>Carrier directory — admin</h2>
+                <p id="adminSummary" class="admin-summary"></p>
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Contact</th>
+                                <th>Email</th>
+                                <th>Lanes</th>
+                                <th>Status</th>
+                                <th>Claim link</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminCarriersBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Dashboard Page (after login) -->
         <div id="dashboardPage" class="page hidden">
             <nav class="navbar">
