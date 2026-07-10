@@ -704,6 +704,18 @@ textarea {
     margin: 6px 0 18px;
 }
 
+.admin-section-title {
+    margin: 28px 0 12px;
+    font-size: 18px;
+    color: #0b0e14;
+}
+
+.admin-count {
+    color: #8b96a8;
+    font-weight: 400;
+    font-size: 14px;
+}
+
 .admin-table-wrap {
     overflow-x: auto;
     border: 1px solid #e3e8ef;

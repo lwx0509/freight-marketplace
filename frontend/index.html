@@ -389,14 +389,32 @@
                 <div class="container">
                     <h1 class="logo">FreightLink <span class="admin-tag">Admin</span></h1>
                     <div class="nav-buttons">
-                        <button class="btn-secondary" onclick="app.loadAdminCarriers()">Refresh</button>
+                        <button class="btn-secondary" onclick="app.loadAdmin()">Refresh</button>
                         <button class="btn-secondary" onclick="app.logout()">Logout</button>
                     </div>
                 </div>
             </nav>
             <div class="container">
-                <h2>Carrier directory — admin</h2>
-                <p id="adminSummary" class="admin-summary"></p>
+                <h2>Admin</h2>
+
+                <h3 class="admin-section-title">All users <span id="adminUsersCount" class="admin-count"></span></h3>
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Type</th>
+                                <th>Company</th>
+                                <th>Admin</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUsersBody"></tbody>
+                    </table>
+                </div>
+
+                <h3 class="admin-section-title">Carrier directory <span id="adminCarriersCount" class="admin-count"></span></h3>
                 <div class="admin-table-wrap">
                     <table class="admin-table">
                         <thead>

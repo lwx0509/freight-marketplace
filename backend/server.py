@@ -189,6 +189,8 @@ class FreightHandler(BaseHTTPRequestHandler):
             self.get_inquiries()
         elif path == '/api/admin/carriers':
             self.admin_list_carriers()
+        elif path == '/api/admin/users':
+            self.admin_list_users()
         elif path == '/api/claim':
             self.get_claim()
         else:
@@ -579,6 +581,20 @@ class FreightHandler(BaseHTTPRequestHandler):
         ).fetchall()
         conn.close()
         self.json_response({'carriers': [dict(r) for r in rows]})
+
+    def admin_list_users(self):
+        """GET /api/admin/users - all users (admin only)."""
+        if not self.require_admin():
+            self.json_response({'error': 'Forbidden'}, 403)
+            return
+
+        conn = get_db()
+        rows = conn.execute(
+            """SELECT id, email, name, user_type, company_name, is_admin, created_at
+               FROM users ORDER BY created_at DESC"""
+        ).fetchall()
+        conn.close()
+        self.json_response({'users': [dict(r) for r in rows]})
 
     def admin_verify_carrier(self, data):
         """POST /api/admin/verify - flip a carrier's status (admin only)."""

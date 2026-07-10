@@ -32,7 +32,7 @@ const app = {
         if (this.token && this.user) {
             if (this.user.is_admin) {
                 this.showPage('adminPage');
-                this.loadAdminCarriers();
+                this.loadAdmin();
             } else {
                 this.showPage('dashboardPage');
                 this.loadDashboard();
@@ -138,7 +138,7 @@ const app = {
 
             if (this.user.is_admin) {
                 this.showPage('adminPage');
-                this.loadAdminCarriers();
+                this.loadAdmin();
             } else {
                 this.showPage('dashboardPage');
                 this.loadDashboard();
@@ -278,6 +278,51 @@ const app = {
     },
 
     // ========== Admin ==========
+    async loadAdmin() {
+        await this.loadAdminUsers();
+        await this.loadAdminCarriers();
+    },
+
+    async loadAdminUsers() {
+        if (!this.token) return;
+        try {
+            const res = await fetch(`${this.apiUrl}/api/admin/users`, {
+                headers: { 'Authorization': `Bearer ${this.token}` }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            this.renderAdminUsers(data.users || []);
+        } catch (err) {
+            console.error('Failed to load admin users:', err);
+        }
+    },
+
+    renderAdminUsers(users) {
+        const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, m => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+        ));
+        const body = document.getElementById('adminUsersBody');
+        const count = document.getElementById('adminUsersCount');
+        if (count) count.textContent = `(${users.length})`;
+        if (!users.length) {
+            body.innerHTML = '<tr><td colspan="6">No users yet.</td></tr>';
+            return;
+        }
+        body.innerHTML = users.map(u => {
+            const type = u.user_type === 'company' ? 'Carrier' : 'Shipper';
+            const admin = u.is_admin ? '<span class="company-badge company-badge--verified">Admin</span>' : '—';
+            const joined = u.created_at ? esc(String(u.created_at).slice(0, 10)) : '—';
+            return `<tr>
+                <td>${esc(u.name) || '—'}</td>
+                <td>${esc(u.email)}</td>
+                <td>${type}</td>
+                <td>${esc(u.company_name) || '—'}</td>
+                <td>${admin}</td>
+                <td>${joined}</td>
+            </tr>`;
+        }).join('');
+    },
+
     async loadAdminCarriers() {
         if (!this.token) return;
         const summary = document.getElementById('adminSummary');
@@ -285,10 +330,7 @@ const app = {
             const res = await fetch(`${this.apiUrl}/api/admin/carriers`, {
                 headers: { 'Authorization': `Bearer ${this.token}` }
             });
-            if (!res.ok) {
-                if (summary) summary.textContent = 'Admin access required.';
-                return;
-            }
+            if (!res.ok) return;
             const data = await res.json();
             this.renderAdminCarriers(data.carriers || []);
         } catch (err) {
