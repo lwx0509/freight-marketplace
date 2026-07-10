@@ -809,6 +809,40 @@ textarea {
     .path-card { padding: 26px; }
 }
 
+/* ===== Legal pages (Terms / Privacy) ===== */
+.legal-page {
+    max-width: 760px;
+    padding-top: 48px;
+    padding-bottom: 64px;
+    color: #33404f;
+    line-height: 1.7;
+}
+
+.legal-page h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #0b0e14;
+    letter-spacing: -0.02em;
+}
+
+.legal-updated {
+    color: #8b96a8;
+    font-size: 14px;
+    margin: 6px 0 28px;
+}
+
+.legal-page h2 {
+    font-size: 19px;
+    font-weight: 700;
+    color: #0b0e14;
+    margin: 28px 0 8px;
+}
+
+.legal-page p {
+    margin-bottom: 14px;
+    font-size: 15px;
+}
+
 /* ===== Site footer ===== */
 .site-footer {
     background: #0b0e14;

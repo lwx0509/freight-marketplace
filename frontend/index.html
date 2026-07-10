@@ -129,8 +129,8 @@
                         <a href="#" onclick="openHowModal(); return false;">How it works</a>
                         <a href="#" onclick="app.showPage('loginPage'); return false;">Log in</a>
                         <a href="#" onclick="app.showSignup('shipper'); return false;">Sign up</a>
-                        <a href="#" onclick="return false;">Terms of Use</a>
-                        <a href="#" onclick="return false;">Privacy Policy</a>
+                        <a href="#" onclick="app.showPage('termsPage'); return false;">Terms of Use</a>
+                        <a href="#" onclick="app.showPage('privacyPage'); return false;">Privacy Policy</a>
                     </nav>
                 </div>
                 <div class="container footer-bottom">
@@ -210,6 +210,107 @@
                     <button type="submit" class="btn-primary btn-block">Login</button>
                     <p class="error" id="loginError"></p>
                 </form>
+            </div>
+        </div>
+
+        <!-- Terms of Use Page -->
+        <div id="termsPage" class="page hidden">
+            <nav class="navbar">
+                <div class="container">
+                    <h1 class="logo">FreightLink</h1>
+                    <button class="btn-link" onclick="app.showPage('landingPage')">← Back</button>
+                </div>
+            </nav>
+            <div class="container legal-page">
+                <h1>Terms of Use</h1>
+                <p class="legal-updated">Last updated: July 9, 2026</p>
+
+                <p>Welcome to FreightLink. These Terms of Use ("Terms") govern your access to and use of the FreightLink website and services (the "Service"). By creating an account or using the Service, you agree to these Terms. If you do not agree, do not use the Service.</p>
+
+                <h2>1. What FreightLink is</h2>
+                <p>FreightLink is an online marketplace that connects parties who need to move goods internationally ("Shippers") with freight carriers ("Carriers"). FreightLink is a platform only. We are not a freight broker, forwarder, or carrier, and we are not a party to any agreement, quote, booking, or shipment arranged between users. All transportation arrangements are solely between the Shipper and the Carrier.</p>
+
+                <h2>2. Eligibility and accounts</h2>
+                <p>You must be at least 18 years old and able to form a binding contract to use the Service. You are responsible for the accuracy of the information you provide, for keeping your login credentials secure, and for all activity that occurs under your account.</p>
+
+                <h2>3. Fees</h2>
+                <p>Shippers may post a shipment listing for $1, which covers the first month the listing is live. Keeping a listing active after the first month costs $5 per month. Access to browse the Carrier directory costs $10 per month. Carriers pay $50 per month for unlimited access to listings and inquiries. Fees are billed through our third-party payment processor, are non-refundable except where required by law, and may change with notice. Applicable taxes may apply.</p>
+
+                <h2>4. Carrier listings and verification</h2>
+                <p>Carriers are identified through the U.S. Federal Maritime Commission's registry of licensed ocean freight intermediaries (NVOCCs) and confirm their own company details before being listed. FreightLink makes reasonable efforts to confirm that Carriers are registered operators, but does not guarantee the qualifications, licensing, insurance, performance, or conduct of any user. You are responsible for conducting your own due diligence before entering into any transaction.</p>
+
+                <h2>5. Acceptable use</h2>
+                <p>You agree not to use the Service for any unlawful purpose, to post false or misleading information, to list domestic-only freight (the Service is for international shipments only), to circumvent fees, to harvest other users' data, or to interfere with the operation or security of the Service.</p>
+
+                <h2>6. No warranties</h2>
+                <p>The Service is provided "as is" and "as available" without warranties of any kind, whether express or implied, including fitness for a particular purpose and non-infringement. FreightLink does not warrant that the Service will be uninterrupted, error-free, or secure, or that any listing or user will meet your expectations.</p>
+
+                <h2>7. Limitation of liability</h2>
+                <p>To the fullest extent permitted by law, FreightLink and its owners, employees, and affiliates will not be liable for any indirect, incidental, special, consequential, or punitive damages, or for any loss arising out of transactions or dealings between users. Our total liability for any claim relating to the Service will not exceed the amount you paid to FreightLink in the three months before the claim.</p>
+
+                <h2>8. Indemnification</h2>
+                <p>You agree to indemnify and hold FreightLink harmless from any claims, losses, or expenses arising out of your use of the Service, your listings or communications, or your dealings with other users.</p>
+
+                <h2>9. Termination</h2>
+                <p>You may stop using the Service at any time. We may suspend or terminate your account if you violate these Terms or use the Service in a way that could harm other users or FreightLink.</p>
+
+                <h2>10. Changes to these Terms</h2>
+                <p>We may update these Terms from time to time. Material changes will be posted on this page with an updated date. Continued use of the Service after changes take effect constitutes acceptance.</p>
+
+                <h2>11. Governing law</h2>
+                <p>These Terms are governed by the laws of [your jurisdiction], without regard to conflict-of-law principles.</p>
+
+                <h2>12. Contact</h2>
+                <p>Questions about these Terms can be sent to [your contact email].</p>
+            </div>
+        </div>
+
+        <!-- Privacy Policy Page -->
+        <div id="privacyPage" class="page hidden">
+            <nav class="navbar">
+                <div class="container">
+                    <h1 class="logo">FreightLink</h1>
+                    <button class="btn-link" onclick="app.showPage('landingPage')">← Back</button>
+                </div>
+            </nav>
+            <div class="container legal-page">
+                <h1>Privacy Policy</h1>
+                <p class="legal-updated">Last updated: July 9, 2026</p>
+
+                <p>This Privacy Policy explains how FreightLink ("we", "us") collects, uses, and shares information when you use our website and services (the "Service").</p>
+
+                <h2>1. Information we collect</h2>
+                <p>We collect information you provide directly, including your name, email address, password, and — for Carriers — company name and address, a contact person and phone number, and the lanes you serve. Shippers provide shipment details such as origin, destination, cargo type, weight, budget, and dates. We also collect limited technical data such as your IP address and basic usage information when you interact with the Service.</p>
+
+                <h2>2. Payment information</h2>
+                <p>Payments are handled by a third-party payment processor. We do not collect or store full card numbers on our servers. The processor's handling of your payment data is governed by its own privacy policy.</p>
+
+                <h2>3. How we use information</h2>
+                <p>We use the information we collect to operate the marketplace, create and manage accounts, display listings and facilitate connections between Shippers and Carriers, process payments, provide support, prevent fraud and abuse, and comply with legal obligations.</p>
+
+                <h2>4. How we share information</h2>
+                <p>Because FreightLink is a marketplace, certain details you provide — such as a Carrier's company name and contact information, or a Shipper's shipment listing — are shown to other users so they can connect with you. We also share information with service providers who help us run the Service (such as hosting and payment processing), and when required by law or to protect our rights or users. We do not sell your personal information.</p>
+
+                <h2>5. Cookies</h2>
+                <p>We use cookies and similar technologies to keep you signed in and to understand how the Service is used. You can control cookies through your browser settings, though some features may not work without them.</p>
+
+                <h2>6. Data retention</h2>
+                <p>We retain your information for as long as your account is active or as needed to provide the Service, resolve disputes, and comply with legal obligations.</p>
+
+                <h2>7. Your choices</h2>
+                <p>You may review and update your account information, or request deletion of your account, by contacting us. Depending on your location, you may have additional rights over your personal data.</p>
+
+                <h2>8. Security</h2>
+                <p>We take reasonable measures to protect your information, but no method of transmission or storage is completely secure, and we cannot guarantee absolute security.</p>
+
+                <h2>9. Children</h2>
+                <p>The Service is not directed to individuals under 18, and we do not knowingly collect their personal information.</p>
+
+                <h2>10. Changes to this policy</h2>
+                <p>We may update this Privacy Policy from time to time. Material changes will be posted on this page with an updated date.</p>
+
+                <h2>11. Contact</h2>
+                <p>Questions about this policy can be sent to [your contact email].</p>
             </div>
         </div>
 
