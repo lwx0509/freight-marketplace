@@ -479,7 +479,7 @@ const app = {
         if (count) count.textContent = `(${carriers.length}${pending ? `, ${pending} pending` : ''})`;
 
         if (!carriers.length) {
-            body.innerHTML = '<tr><td colspan="8">No carriers imported yet.</td></tr>';
+            body.innerHTML = '<tr><td colspan="11">No carriers imported yet.</td></tr>';
             return;
         }
 
@@ -506,10 +506,13 @@ const app = {
                 : '—';
             return `<tr>
                 <td>${esc(c.company_name)}</td>
+                <td>${esc(c.trade_name) || '—'}</td>
                 <td>${esc(c.contact_name) || '—'}</td>
                 <td>${esc(c.email) || '—'}</td>
                 <td>${type}</td>
                 <td>${location}</td>
+                <td>${esc(c.license_number) || '—'}</td>
+                <td>${esc(c.renewal_date) || '—'}</td>
                 <td>${badge}</td>
                 <td>${linkCell}</td>
                 <td>${actions}</td>
