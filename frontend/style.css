@@ -551,7 +551,7 @@ textarea {
 /* ===== Compact static hero (Option C) ===== */
 .hero-compact {
     position: relative;
-    min-height: calc(100vh - 66px);
+    min-height: 80vh;
     background: #0b0e14;
     overflow: hidden;
     padding: 0;
@@ -622,9 +622,127 @@ textarea {
 }
 
 @media (max-width: 640px) {
-    .hero-compact { min-height: calc(100vh - 60px); }
+    .hero-compact { min-height: 82vh; }
     .hero-actions { flex-direction: column; width: 100%; max-width: 320px; }
     .hero-actions .btn-large { width: 100%; }
+}
+
+/* ===== Landing: pricing path cards ===== */
+.paths-section {
+    background: #f7f9fc;
+    padding: 72px 0;
+}
+
+.paths-head {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 44px;
+}
+
+.paths-eyebrow {
+    color: #0066cc;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.paths-title {
+    font-size: clamp(26px, 3.4vw, 38px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #0b0e14;
+    line-height: 1.1;
+}
+
+.paths-lead {
+    color: #5a6474;
+    font-size: 17px;
+    margin-top: 14px;
+}
+
+.paths-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+.path-card {
+    background: #fff;
+    border: 1px solid #e3e8ef;
+    border-radius: 14px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+}
+
+.path-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0b0e14;
+}
+
+.path-price {
+    margin: 14px 0 6px;
+    color: #5a6474;
+    font-size: 15px;
+}
+
+.path-price-big {
+    font-size: 34px;
+    font-weight: 800;
+    color: #0b0e14;
+}
+
+.path-price-unit {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0b0e14;
+}
+
+.path-steps {
+    list-style: none;
+    margin: 18px 0 26px;
+    padding: 0;
+}
+
+.path-steps li {
+    position: relative;
+    padding: 10px 0 10px 26px;
+    color: #5a6474;
+    font-size: 15px;
+    line-height: 1.5;
+    border-top: 1px solid #f0f2f6;
+}
+
+.path-steps li:first-child {
+    border-top: 0;
+}
+
+.path-steps li strong {
+    color: #0b0e14;
+    font-weight: 600;
+}
+
+.path-steps li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    color: #1d9e75;
+    font-weight: 700;
+}
+
+.path-card .btn-block {
+    margin-top: auto;
+}
+
+@media (max-width: 720px) {
+    .paths-grid { grid-template-columns: 1fr; }
+    .path-card { padding: 26px; }
 }
 
 /* ===== Signup: role info panel + form ===== */
