@@ -549,9 +549,16 @@ textarea {
 
 
 /* ===== Compact static hero (Option C) ===== */
+.hero-screen {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 66px);
+}
+
 .hero-compact {
     position: relative;
-    min-height: calc(100vh - 66px);
+    flex: 1 1 auto;
+    min-height: 0;
     background: #0b0e14;
     overflow: hidden;
     padding: 0;
@@ -622,7 +629,7 @@ textarea {
 }
 
 @media (max-width: 640px) {
-    .hero-compact { min-height: calc(100vh - 60px); }
+    .hero-screen { min-height: calc(100vh - 60px); }
     .hero-actions { flex-direction: column; width: 100%; max-width: 320px; }
     .hero-actions .btn-large { width: 100%; }
 }
