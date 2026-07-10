@@ -551,8 +551,7 @@ textarea {
 /* ===== Compact static hero (Option C) ===== */
 .hero-compact {
     position: relative;
-    min-height: 58vh;
-    max-height: 560px;
+    min-height: calc(100vh - 66px);
     background: #0b0e14;
     overflow: hidden;
     padding: 0;
@@ -562,19 +561,29 @@ textarea {
     text-align: center;
 }
 
+.hero-slideshow {
+    position: absolute;
+    inset: 0;
+}
+
 .hero-bg {
     position: absolute;
     inset: 0;
     background-size: cover;
     background-position: center;
-    opacity: 0.42;
+    opacity: 0;
     filter: grayscale(45%);
+    transition: opacity 1.6s ease-in-out;
 }
 
-.hero-bg::after {
-    content: '';
+.hero-bg.active {
+    opacity: 0.42;
+}
+
+.hero-overlay {
     position: absolute;
     inset: 0;
+    z-index: 1;
     background: linear-gradient(to bottom, rgba(11,14,20,0.5) 0%, rgba(11,14,20,0.3) 45%, rgba(11,14,20,0.85) 100%);
 }
 
@@ -613,7 +622,7 @@ textarea {
 }
 
 @media (max-width: 640px) {
-    .hero-compact { min-height: 60vh; max-height: none; }
+    .hero-compact { min-height: calc(100vh - 60px); }
     .hero-actions { flex-direction: column; width: 100%; max-width: 320px; }
     .hero-actions .btn-large { width: 100%; }
 }

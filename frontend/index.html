@@ -21,7 +21,12 @@
             </nav>
 
             <section class="hero hero-compact" id="heroCompact">
-                <div class="hero-bg" style="background-image:url('/images/container_ship.jpg')"></div>
+                <div class="hero-slideshow" id="heroSlideshow">
+                    <div class="hero-bg active" style="background-image:url('/images/container_ship.jpg')"></div>
+                    <div class="hero-bg" style="background-image:url('/images/port.jpg')"></div>
+                    <div class="hero-bg" style="background-image:url('/images/globe.jpg')"></div>
+                </div>
+                <div class="hero-overlay"></div>
                 <div class="hero-inner">
                     <div class="hero-kicker"><span class="tag-line"></span>International freight only<span class="tag-line"></span></div>
                     <h2 class="hero-title">Skip the brokers.<br><span class="hero-title-accent">Ship cross-border direct.</span></h2>
@@ -32,6 +37,18 @@
                     </div>
                 </div>
             </section>
+            <script>
+            (function () {
+                var slides = document.querySelectorAll('#heroSlideshow .hero-bg');
+                if (slides.length < 2) return;
+                var i = 0;
+                setInterval(function () {
+                    slides[i].classList.remove('active');
+                    i = (i + 1) % slides.length;
+                    slides[i].classList.add('active');
+                }, 5000);
+            })();
+            </script>
 
         </div>
 
