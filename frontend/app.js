@@ -301,21 +301,19 @@ const app = {
         const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, m => (
             { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
         ));
-        const shippers = users.filter(u => u.user_type === 'shipper');
+        const shippers = users.filter(u => u.user_type === 'shipper' && !u.is_admin);
         const body = document.getElementById('adminShippersBody');
         const count = document.getElementById('adminShippersCount');
         if (count) count.textContent = `(${shippers.length})`;
         if (!shippers.length) {
-            body.innerHTML = '<tr><td colspan="4">No shippers yet.</td></tr>';
+            body.innerHTML = '<tr><td colspan="3">No shippers yet.</td></tr>';
             return;
         }
         body.innerHTML = shippers.map(u => {
-            const admin = u.is_admin ? '<span class="company-badge company-badge--verified">Admin</span>' : '—';
             const joined = u.created_at ? esc(String(u.created_at).slice(0, 10)) : '—';
             return `<tr>
                 <td>${esc(u.name) || '—'}</td>
                 <td>${esc(u.email)}</td>
-                <td>${admin}</td>
                 <td>${joined}</td>
             </tr>`;
         }).join('');

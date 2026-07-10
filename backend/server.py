@@ -589,9 +589,10 @@ class FreightHandler(BaseHTTPRequestHandler):
             return
 
         conn = get_db()
+        # Admins are recorded in the database but excluded from the user population.
         rows = conn.execute(
             """SELECT id, email, name, user_type, company_name, is_admin, created_at
-               FROM users ORDER BY created_at DESC"""
+               FROM users WHERE COALESCE(is_admin, 0) = 0 ORDER BY created_at DESC"""
         ).fetchall()
         conn.close()
         self.json_response({'users': [dict(r) for r in rows]})
