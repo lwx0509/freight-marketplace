@@ -828,6 +828,38 @@ textarea {
     font-size: 13px;
 }
 
+.form-note {
+    font-size: 14px;
+    margin-top: 8px;
+    min-height: 18px;
+}
+
+.section--danger {
+    border: 1px solid #f4c0c0;
+    background: #fdf6f6;
+}
+
+.danger-text {
+    color: #a32d2d;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.btn-danger {
+    background: #e24b4a;
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background: #c93b3a;
+}
+
 /* ===== Legal pages (Terms / Privacy) ===== */
 .legal-page {
     max-width: 760px;

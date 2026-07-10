@@ -229,6 +229,10 @@ class FreightHandler(BaseHTTPRequestHandler):
             self.post_claim(data)
         elif path == '/api/change-password':
             self.change_password(data)
+        elif path == '/api/profile':
+            self.update_profile(data)
+        elif path == '/api/account/delete':
+            self.delete_account(data)
         else:
             self.json_response({'error': 'Not found'}, 404)
 
@@ -388,6 +392,60 @@ class FreightHandler(BaseHTTPRequestHandler):
             return
 
         conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (hash_password(new), user_id))
+        conn.commit()
+        conn.close()
+        self.json_response({'success': True})
+
+    def update_profile(self, data):
+        """POST /api/profile - update the logged-in user's name / email / company."""
+        user_id = verify_token(self.get_token())
+        if not user_id:
+            self.json_response({'error': 'Unauthorized'}, 401)
+            return
+
+        name = (data.get('name') or '').strip()
+        email = (data.get('email') or '').strip().lower()
+        company = (data.get('company_name') or '').strip()
+        if not name or not email:
+            self.json_response({'error': 'Name and email are required'}, 400)
+            return
+
+        conn = get_db()
+        taken = conn.execute("SELECT id FROM users WHERE email = ? AND id != ?", (email, user_id)).fetchone()
+        if taken:
+            conn.close()
+            self.json_response({'error': 'That email is already in use'}, 400)
+            return
+        conn.execute(
+            "UPDATE users SET name = ?, email = ?, company_name = ? WHERE id = ?",
+            (name, email, company or None, user_id)
+        )
+        conn.commit()
+        conn.close()
+        self.json_response({'success': True, 'name': name, 'email': email, 'company_name': company})
+
+    def delete_account(self, data):
+        """POST /api/account/delete - delete the logged-in user's account (password-confirmed)."""
+        user_id = verify_token(self.get_token())
+        if not user_id:
+            self.json_response({'error': 'Unauthorized'}, 401)
+            return
+
+        password = data.get('password', '')
+        conn = get_db()
+        user = conn.execute("SELECT password_hash FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user or not verify_password(password, user['password_hash']):
+            conn.close()
+            self.json_response({'error': 'Password is incorrect'}, 400)
+            return
+
+        conn.execute("DELETE FROM inquiries WHERE shipment_id IN (SELECT id FROM shipments WHERE shipper_id = ?)", (user_id,))
+        conn.execute("DELETE FROM inquiries WHERE company_id = ?", (user_id,))
+        conn.execute("DELETE FROM shipments WHERE shipper_id = ?", (user_id,))
+        conn.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+        # Keep any carrier directory record but detach it from the deleted account.
+        conn.execute("UPDATE carriers SET user_id = NULL WHERE user_id = ?", (user_id,))
+        conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
         conn.commit()
         conn.close()
         self.json_response({'success': True})

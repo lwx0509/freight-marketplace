@@ -465,48 +465,99 @@
                 <div id="shipperDashboard" class="dashboard hidden">
                     <h2>Shipper Dashboard</h2>
 
-                    <div class="section">
-                        <h3>List a New Shipment</h3>
-                        <form onsubmit="app.handleCreateShipment(event)">
-                            <div class="field-group">
-                                <label class="field-label">Origin</label>
-                                <div class="field-row">
-                                    <input type="text" id="shipmentOriginCity" placeholder="City" required>
-                                    <input type="text" id="shipmentOriginState" placeholder="State / Province" required>
+                    <div class="admin-tabs">
+                        <button class="admin-tab active" id="dtPost" onclick="app.switchDashTab('post')">Post shipment</button>
+                        <button class="admin-tab" id="dtShip" onclick="app.switchDashTab('ship')">My shipments</button>
+                        <button class="admin-tab" id="dtCarriers" onclick="app.switchDashTab('carriers')">Carriers</button>
+                        <button class="admin-tab" id="dtInquiries" onclick="app.switchDashTab('inquiries')">Inquiries</button>
+                        <button class="admin-tab" id="dtAccount" onclick="app.switchDashTab('account')">Account</button>
+                    </div>
+
+                    <div class="dash-panel" id="dpPost">
+                        <div class="section">
+                            <h3>List a new shipment</h3>
+                            <form onsubmit="app.handleCreateShipment(event)">
+                                <div class="field-group">
+                                    <label class="field-label">Origin</label>
+                                    <div class="field-row">
+                                        <input type="text" id="shipmentOriginCity" placeholder="City" required>
+                                        <input type="text" id="shipmentOriginState" placeholder="State / Province" required>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="field-group">
-                                <label class="field-label">Destination</label>
-                                <div class="field-row">
-                                    <input type="text" id="shipmentDestCity" placeholder="City" required>
-                                    <input type="text" id="shipmentDestState" placeholder="State / Province" required>
+                                <div class="field-group">
+                                    <label class="field-label">Destination</label>
+                                    <div class="field-row">
+                                        <input type="text" id="shipmentDestCity" placeholder="City" required>
+                                        <input type="text" id="shipmentDestState" placeholder="State / Province" required>
+                                    </div>
                                 </div>
-                            </div>
-                            <input type="text" id="shipmentCargoType" placeholder="Cargo Type (e.g., Perishable, Hazmat)" required>
-                            <input type="number" id="shipmentWeight" placeholder="Weight (tons)" step="0.1">
-                            <input type="number" id="shipmentBudget" placeholder="Budget (USD)" step="0.01">
-                            <input type="date" id="shipmentDate" placeholder="Shipping Date">
-                            <script>document.getElementById('shipmentDate').min = new Date().toISOString().slice(0, 10);</script>
-                            <textarea id="shipmentNotes" placeholder="Additional details..."></textarea>
-                            <button type="submit" class="btn-primary btn-block">Post Shipment</button>
-                        </form>
+                                <input type="text" id="shipmentCargoType" placeholder="Cargo Type (e.g., Perishable, Hazmat)" required>
+                                <input type="number" id="shipmentWeight" placeholder="Weight (tons)" step="0.1">
+                                <input type="number" id="shipmentBudget" placeholder="Budget (USD)" step="0.01">
+                                <input type="date" id="shipmentDate" placeholder="Shipping Date">
+                                <script>document.getElementById('shipmentDate').min = new Date().toISOString().slice(0, 10);</script>
+                                <textarea id="shipmentNotes" placeholder="Additional details..."></textarea>
+                                <button type="submit" class="btn-primary btn-block">Post Shipment</button>
+                            </form>
+                        </div>
                     </div>
 
-                    <div class="section">
-                        <h3>Your Shipments</h3>
-                        <div id="shipmentsList"></div>
+                    <div class="dash-panel" id="dpShip" style="display: none;">
+                        <div class="section">
+                            <h3>Your shipments</h3>
+                            <div id="shipmentsList"></div>
+                        </div>
                     </div>
 
-                    <div class="section">
-                        <h3>Browse Carriers</h3>
-                        <p id="accessStatus"></p>
-                        <button id="buyAccessBtn" class="btn-primary" onclick="app.buyShipperAccess()" style="display: none;">Browse Carriers ($10/mo)</button>
-                        <div id="companiesList" style="display: none;"></div>
+                    <div class="dash-panel" id="dpCarriers" style="display: none;">
+                        <div class="section">
+                            <h3>Browse carriers</h3>
+                            <div id="companiesList"></div>
+                        </div>
                     </div>
 
-                    <div class="section">
-                        <h3>Inquiries</h3>
-                        <div id="shipperInquiriesList"></div>
+                    <div class="dash-panel" id="dpInquiries" style="display: none;">
+                        <div class="section">
+                            <h3>Inquiries</h3>
+                            <div id="shipperInquiriesList"></div>
+                        </div>
+                    </div>
+
+                    <div class="dash-panel" id="dpAccount" style="display: none;">
+                        <div class="section">
+                            <h3>Directory access</h3>
+                            <p id="accessStatus"></p>
+                            <button id="buyAccessBtn" class="btn-primary" onclick="app.buyShipperAccess()" style="display: none;">Buy directory access ($10/mo)</button>
+                        </div>
+                        <div class="section">
+                            <h3>Profile</h3>
+                            <form onsubmit="app.saveProfile(event)">
+                                <input type="text" id="acctName" placeholder="Full name" required>
+                                <input type="email" id="acctEmail" placeholder="Email" required>
+                                <input type="text" id="acctCompany" placeholder="Company (optional)">
+                                <button type="submit" class="btn-primary">Save profile</button>
+                                <p class="form-note" id="acctProfileNote"></p>
+                            </form>
+                        </div>
+                        <div class="section">
+                            <h3>Change password</h3>
+                            <form onsubmit="app.submitAccountPw(event)">
+                                <input type="password" id="acctCur" placeholder="Current password" required>
+                                <input type="password" id="acctNew" placeholder="New password (min 6 characters)" required>
+                                <input type="password" id="acctConf" placeholder="Confirm new password" required>
+                                <button type="submit" class="btn-primary">Update password</button>
+                                <p class="form-note" id="acctPwNote"></p>
+                            </form>
+                        </div>
+                        <div class="section section--danger">
+                            <h3>Delete account</h3>
+                            <p class="danger-text">This permanently deletes your account and your shipments. This can't be undone.</p>
+                            <form onsubmit="app.deleteAccount(event)">
+                                <input type="password" id="acctDelPw" placeholder="Enter your password to confirm" required>
+                                <button type="submit" class="btn-danger">Delete my account</button>
+                                <p class="form-note" id="acctDelNote"></p>
+                            </form>
+                        </div>
                     </div>
                 </div>
 

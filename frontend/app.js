@@ -183,6 +183,94 @@ const app = {
         }
     },
 
+    // ========== Shipper dashboard tabs + account ==========
+    switchDashTab(tab) {
+        const panels = { post: 'dpPost', ship: 'dpShip', carriers: 'dpCarriers', inquiries: 'dpInquiries', account: 'dpAccount' };
+        const btns = { post: 'dtPost', ship: 'dtShip', carriers: 'dtCarriers', inquiries: 'dtInquiries', account: 'dtAccount' };
+        Object.keys(panels).forEach(t => {
+            const p = document.getElementById(panels[t]); if (p) p.style.display = (t === tab) ? 'block' : 'none';
+            const b = document.getElementById(btns[t]); if (b) b.classList.toggle('active', t === tab);
+        });
+    },
+
+    async loadProfile() {
+        try {
+            const res = await fetch(`${this.apiUrl}/api/me`, { headers: { 'Authorization': `Bearer ${this.token}` } });
+            if (!res.ok) return;
+            const u = await res.json();
+            const n = document.getElementById('acctName'); if (n) n.value = u.name || '';
+            const e = document.getElementById('acctEmail'); if (e) e.value = u.email || '';
+            const c = document.getElementById('acctCompany'); if (c) c.value = u.company_name || '';
+        } catch (err) { console.error('Failed to load profile:', err); }
+    },
+
+    async saveProfile(event) {
+        event.preventDefault();
+        const note = document.getElementById('acctProfileNote');
+        note.style.color = '#e24b4a';
+        const payload = {
+            name: document.getElementById('acctName').value,
+            email: document.getElementById('acctEmail').value,
+            company_name: document.getElementById('acctCompany').value
+        };
+        try {
+            const res = await fetch(`${this.apiUrl}/api/profile`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) { note.textContent = data.error || 'Could not save profile.'; return; }
+            this.user.email = data.email;
+            localStorage.setItem('user', JSON.stringify(this.user));
+            const disp = document.getElementById('userDisplay'); if (disp) disp.textContent = data.email;
+            note.style.color = '#1d9e75';
+            note.textContent = 'Profile saved.';
+        } catch (err) { note.textContent = 'Network error'; }
+    },
+
+    async submitAccountPw(event) {
+        event.preventDefault();
+        const note = document.getElementById('acctPwNote');
+        note.style.color = '#e24b4a';
+        const cur = document.getElementById('acctCur').value;
+        const nw = document.getElementById('acctNew').value;
+        const conf = document.getElementById('acctConf').value;
+        if (nw !== conf) { note.textContent = 'New passwords do not match.'; return; }
+        try {
+            const res = await fetch(`${this.apiUrl}/api/change-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+                body: JSON.stringify({ current_password: cur, new_password: nw })
+            });
+            const data = await res.json();
+            if (!res.ok) { note.textContent = data.error || 'Could not change password.'; return; }
+            note.style.color = '#1d9e75';
+            note.textContent = 'Password updated.';
+            document.getElementById('acctCur').value = '';
+            document.getElementById('acctNew').value = '';
+            document.getElementById('acctConf').value = '';
+        } catch (err) { note.textContent = 'Network error'; }
+    },
+
+    async deleteAccount(event) {
+        event.preventDefault();
+        const note = document.getElementById('acctDelNote');
+        note.style.color = '#e24b4a';
+        if (!confirm('Delete your account permanently? This cannot be undone.')) return;
+        const pw = document.getElementById('acctDelPw').value;
+        try {
+            const res = await fetch(`${this.apiUrl}/api/account/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+                body: JSON.stringify({ password: pw })
+            });
+            const data = await res.json();
+            if (!res.ok) { note.textContent = data.error || 'Could not delete account.'; return; }
+            this.logout();
+        } catch (err) { note.textContent = 'Network error'; }
+    },
+
     // ========== Carrier claim ==========
     async startClaim(token) {
         this.claimToken = token;
@@ -274,6 +362,7 @@ const app = {
             // Check access status
             await this.checkShipperAccess();
             await this.loadShipperInquiries();
+            this.loadProfile();
         } catch (err) {
             console.error('Failed to load shipper dashboard:', err);
         }
