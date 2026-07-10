@@ -310,17 +310,35 @@ const app = {
     renderCompanies(companies) {
         const container = document.getElementById('companiesList');
 
-        if (companies.length === 0) {
-            container.innerHTML = '<p>No carriers available.</p>';
+        if (!companies || companies.length === 0) {
+            container.innerHTML = '<p>No carriers available yet.</p>';
+            container.style.display = 'block';
+            document.getElementById('buyAccessBtn').style.display = 'none';
+            document.getElementById('accessStatus').textContent = 'Browse available carriers:';
             return;
         }
 
-        container.innerHTML = companies.map(c => `
-            <div class="company-card">
-                <h4>${c.company_name || c.name}</h4>
-                <p>Contact: ${c.name}</p>
-            </div>
-        `).join('');
+        const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, m => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+        ));
+
+        container.innerHTML = companies.map(c => {
+            const meta = esc([c.lanes, c.country].filter(Boolean).join(' · '));
+            if (c.status === 'pending') {
+                return `
+                    <div class="company-card company-card--pending">
+                        <div class="company-name company-name--masked">🔒 Verified carrier</div>
+                        <div class="company-meta">${meta || 'International lanes'}</div>
+                        <span class="company-badge company-badge--pending">Pending verification</span>
+                    </div>`;
+            }
+            return `
+                <div class="company-card">
+                    <div class="company-name">${esc(c.company_name)}</div>
+                    <div class="company-meta">${meta}</div>
+                    <span class="company-badge company-badge--verified">Verified</span>
+                </div>`;
+        }).join('');
 
         container.style.display = 'block';
         document.getElementById('buyAccessBtn').style.display = 'none';

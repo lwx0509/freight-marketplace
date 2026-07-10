@@ -27,22 +27,58 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')  # Set in production
 
 # ========== Database Setup ==========
 def init_db():
-    """Initialize database from schema.sql"""
-    if os.path.exists(DB_PATH):
-        return
-
+    """Ensure all tables exist. schema.sql uses CREATE TABLE IF NOT EXISTS, so this
+    is safe to run on every startup (fresh or existing database)."""
     conn = sqlite3.connect(DB_PATH)
     with open(SCHEMA_PATH, 'r') as f:
         conn.executescript(f.read())
     conn.commit()
     conn.close()
-    print(f"✓ Database initialized at {DB_PATH}")
+    print(f"✓ Database ready at {DB_PATH}")
 
 def get_db():
     """Get database connection"""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+def migrate_db():
+    """Idempotent migrations so existing databases pick up new tables/columns."""
+    conn = get_db()
+    cur = conn.cursor()
+
+    # carriers directory table
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS carriers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            company_name TEXT NOT NULL,
+            contact_name TEXT,
+            email TEXT,
+            phone TEXT,
+            country TEXT,
+            lanes TEXT,
+            fmc_id TEXT,
+            status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'verified')),
+            claim_token TEXT UNIQUE,
+            user_id INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            verified_at TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_carriers_email ON carriers(email)")
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_carriers_token ON carriers(claim_token)")
+
+    # is_admin column on users (only if the table exists and lacks the column)
+    tables = [r['name'] for r in cur.execute(
+        "SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
+    if 'users' in tables:
+        cols = [r['name'] for r in cur.execute("PRAGMA table_info(users)").fetchall()]
+        if 'is_admin' not in cols:
+            cur.execute("ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0")
+
+    conn.commit()
+    conn.close()
 
 # ========== Auth Helpers ==========
 def hash_password(password):
@@ -365,7 +401,8 @@ class FreightHandler(BaseHTTPRequestHandler):
         self.json_response({'shipments': result})
 
     def get_companies(self):
-        """GET /api/companies - Get list of companies"""
+        """GET /api/companies - Carrier directory. Verified carriers show full
+        details; pending carriers are masked here so hidden fields never reach the client."""
         token = self.get_token()
         user_id = verify_token(token)
 
@@ -374,12 +411,33 @@ class FreightHandler(BaseHTTPRequestHandler):
             return
 
         conn = get_db()
-        companies = conn.execute(
-            'SELECT id, name, company_name FROM users WHERE user_type = "company"'
+        carriers = conn.execute(
+            """SELECT id, company_name, country, lanes, status
+               FROM carriers
+               ORDER BY (status = 'verified') DESC, company_name COLLATE NOCASE"""
         ).fetchall()
         conn.close()
 
-        result = [dict(c) for c in companies]
+        result = []
+        for c in carriers:
+            if c['status'] == 'verified':
+                result.append({
+                    'id': c['id'],
+                    'status': 'verified',
+                    'company_name': c['company_name'],
+                    'country': c['country'],
+                    'lanes': c['lanes'],
+                })
+            else:
+                # Masked: never expose company_name / contact for pending carriers.
+                result.append({
+                    'id': c['id'],
+                    'status': 'pending',
+                    'company_name': None,
+                    'country': c['country'],
+                    'lanes': c['lanes'],
+                })
+
         self.json_response({'companies': result})
 
     # ========== Inquiry Endpoints ==========
@@ -494,6 +552,7 @@ class FreightHandler(BaseHTTPRequestHandler):
 # ========== Main ==========
 if __name__ == '__main__':
     init_db()
+    migrate_db()
 
     server = ThreadingHTTPServer(('0.0.0.0', PORT), FreightHandler)
     print(f"✓ Freight Marketplace server running at http://localhost:{PORT}")

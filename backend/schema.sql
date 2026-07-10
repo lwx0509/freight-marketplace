@@ -6,8 +6,29 @@ CREATE TABLE IF NOT EXISTS users (
     name TEXT NOT NULL,
     user_type TEXT NOT NULL CHECK (user_type IN ('shipper', 'company')),
     company_name TEXT,
+    is_admin INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Carriers directory (pre-loaded from FMC/NVOCC data; masked until verified)
+CREATE TABLE IF NOT EXISTS carriers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_name TEXT NOT NULL,
+    contact_name TEXT,
+    email TEXT,
+    phone TEXT,
+    country TEXT,
+    lanes TEXT,
+    fmc_id TEXT,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'verified')),
+    claim_token TEXT UNIQUE,
+    user_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    verified_at TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+CREATE INDEX IF NOT EXISTS idx_carriers_email ON carriers(email);
+CREATE INDEX IF NOT EXISTS idx_carriers_token ON carriers(claim_token);
 
 -- Shipments (created by shippers)
 CREATE TABLE IF NOT EXISTS shipments (
