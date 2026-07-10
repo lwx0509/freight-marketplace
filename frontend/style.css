@@ -863,6 +863,11 @@ textarea {
     border-bottom: none;
 }
 
+.admin-table td.col-company {
+    white-space: normal;
+    max-width: 220px;
+}
+
 .btn-sm {
     padding: 6px 12px;
     font-size: 13px;

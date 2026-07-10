@@ -505,7 +505,7 @@ const app = {
                 ? `<button class="btn-link btn-sm" onclick="app.copyText('${link.replace(/'/g, "\\'")}', this)">Copy</button>`
                 : '—';
             return `<tr>
-                <td>${esc(c.company_name)}</td>
+                <td class="col-company">${esc(c.company_name)}</td>
                 <td>${esc(c.trade_name) || '—'}</td>
                 <td>${esc(c.contact_name) || '—'}</td>
                 <td>${esc(c.email) || '—'}</td>
