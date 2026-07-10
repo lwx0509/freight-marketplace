@@ -95,7 +95,7 @@
                             <button class="btn-secondary btn-block" onclick="closeHowModal(); app.showSignup('company')">I'm a carrier →</button>
                         </div>
                     </div>
-                    <p class="howmodal-verify">Carriers are drawn from the U.S. Federal Maritime Commission's <a href="https://www2.fmc.gov/oti/NVOCC.aspx" target="_blank" rel="noopener">NVOCC registry</a> and confirm their own listings. FreightLink doesn't vet or endorse any party — do your own due diligence before transacting.</p>
+                    <p class="howmodal-verify">Carriers are drawn from the U.S. Federal Maritime Commission's <a href="https://www2.fmc.gov/oti/NVOCC.aspx" target="_blank" rel="noopener">NVOCC registry</a> and confirm their own listings. FreightLink doesn't vet or endorse any party — please do your own due diligence before entering into any agreement.</p>
                     <div class="howmodal-trust">
                         <span><strong>0%</strong> broker commission</span>
                         <span><strong>9,000+</strong> FMC-registered carriers</span>
@@ -223,7 +223,7 @@
                     <input type="hidden" id="signupUserType" value="shipper">
 
                     <button type="submit" class="btn-primary btn-block">Create Account</button>
-                    <p class="signup-disclaimer">FreightLink is a listings platform and does not vet, endorse, or guarantee any shipper or carrier. All parties are responsible for performing their own due diligence before transacting.</p>
+                    <p class="signup-disclaimer">FreightLink is a listings platform — we don't vet, endorse, or guarantee any shipper or carrier. Please do your own due diligence before entering into any agreement.</p>
                     <p class="signup-agree">By creating an account you agree to our <a href="/terms" target="_blank" rel="noopener">Terms of Use</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</p>
                     <p class="error" id="signupError"></p>
                 </form>
@@ -505,13 +505,37 @@
                     <div class="dash-panel" id="dpShip" style="display: none;">
                         <div class="section">
                             <h3>Your shipments</h3>
-                            <div id="shipmentsList"></div>
+                            <input type="text" class="admin-search" id="shipmentSearch" placeholder="Search shipments…" oninput="app.filterTable('shipmentSearch', 'shipmentsBody')">
+                            <div class="admin-table-wrap">
+                                <table class="admin-table sortable">
+                                    <thead>
+                                        <tr>
+                                            <th onclick="app.sortTable(this)">Route</th>
+                                            <th onclick="app.sortTable(this)">Cargo</th>
+                                            <th onclick="app.sortTable(this, 'number')">Weight</th>
+                                            <th onclick="app.sortTable(this, 'number')">Budget</th>
+                                            <th onclick="app.sortTable(this)">Shipping date</th>
+                                            <th onclick="app.sortTable(this)">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="shipmentsBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
                     <div class="dash-panel" id="dpCarriers" style="display: none;">
                         <div class="section">
                             <h3>Browse carriers</h3>
+                            <div class="filter-row">
+                                <input type="text" class="admin-search" id="carrierDirSearch" placeholder="Search carriers…" oninput="app.applyCarrierFilter()">
+                                <select class="admin-select" id="carrierDirSort" onchange="app.applyCarrierFilter()">
+                                    <option value="name">Sort by name</option>
+                                    <option value="location">Sort by location</option>
+                                    <option value="type">Sort by type</option>
+                                    <option value="status">Sort by status</option>
+                                </select>
+                            </div>
                             <div id="companiesList"></div>
                         </div>
                     </div>
@@ -519,7 +543,20 @@
                     <div class="dash-panel" id="dpInquiries" style="display: none;">
                         <div class="section">
                             <h3>Inquiries</h3>
-                            <div id="shipperInquiriesList"></div>
+                            <input type="text" class="admin-search" id="inquirySearch" placeholder="Search inquiries…" oninput="app.filterTable('inquirySearch', 'shipperInquiriesBody')">
+                            <div class="admin-table-wrap">
+                                <table class="admin-table sortable">
+                                    <thead>
+                                        <tr>
+                                            <th onclick="app.sortTable(this)">Route</th>
+                                            <th onclick="app.sortTable(this)">From carrier</th>
+                                            <th onclick="app.sortTable(this)">Message</th>
+                                            <th onclick="app.sortTable(this)">Received</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="shipperInquiriesBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -573,14 +610,42 @@
                     <div class="dash-panel" id="cpanShip">
                         <div class="section">
                             <h3>Available shipments</h3>
-                            <div id="availableShipmentsList"></div>
+                            <input type="text" class="admin-search" id="availSearch" placeholder="Search shipments…" oninput="app.filterTable('availSearch', 'availableShipmentsBody')">
+                            <div class="admin-table-wrap">
+                                <table class="admin-table sortable">
+                                    <thead>
+                                        <tr>
+                                            <th onclick="app.sortTable(this)">Route</th>
+                                            <th onclick="app.sortTable(this)">Cargo</th>
+                                            <th onclick="app.sortTable(this, 'number')">Weight</th>
+                                            <th onclick="app.sortTable(this, 'number')">Budget</th>
+                                            <th onclick="app.sortTable(this)">Shipping date</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="availableShipmentsBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
                     <div class="dash-panel" id="cpanInq" style="display: none;">
                         <div class="section">
                             <h3>My inquiries</h3>
-                            <div id="companyInquiriesList"></div>
+                            <input type="text" class="admin-search" id="cInquirySearch" placeholder="Search inquiries…" oninput="app.filterTable('cInquirySearch', 'companyInquiriesBody')">
+                            <div class="admin-table-wrap">
+                                <table class="admin-table sortable">
+                                    <thead>
+                                        <tr>
+                                            <th onclick="app.sortTable(this)">Route</th>
+                                            <th onclick="app.sortTable(this)">Shipper</th>
+                                            <th onclick="app.sortTable(this)">Message</th>
+                                            <th onclick="app.sortTable(this)">Sent</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="companyInquiriesBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 

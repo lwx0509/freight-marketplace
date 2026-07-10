@@ -790,6 +790,46 @@ textarea {
     border-color: #0066cc;
 }
 
+.filter-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.filter-row .admin-search {
+    margin-bottom: 0;
+    flex: 1 1 220px;
+}
+
+.admin-select {
+    padding: 10px 12px;
+    border: 1px solid #d7deea;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+    color: #0b0e14;
+    cursor: pointer;
+}
+
+.admin-table.sortable th {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.admin-table.sortable th.sorted-asc::after {
+    content: ' ▲';
+    font-size: 9px;
+    color: #0066cc;
+}
+
+.admin-table.sortable th.sorted-desc::after {
+    content: ' ▼';
+    font-size: 9px;
+    color: #0066cc;
+}
+
 .admin-table-wrap {
     overflow-x: auto;
     border: 1px solid #e3e8ef;

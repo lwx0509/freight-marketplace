@@ -538,48 +538,72 @@ const app = {
         }
     },
 
-    renderShipments(shipments) {
-        const container = document.getElementById('shipmentsList');
+    esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, m => (
+            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
+        ));
+    },
 
-        if (shipments.length === 0) {
-            container.innerHTML = '<p>No shipments posted yet.</p>';
+    // Sort a table by the clicked <th>. type 'number' sorts numerically; cells may
+    // carry a data-sort attribute to control the sort key independently of display.
+    sortTable(th, type) {
+        const table = th.closest('table');
+        const tbody = table.querySelector('tbody');
+        const headers = Array.from(th.parentNode.children);
+        const idx = headers.indexOf(th);
+        const asc = th.getAttribute('data-dir') !== 'asc';
+        headers.forEach(h => { h.removeAttribute('data-dir'); h.classList.remove('sorted-asc', 'sorted-desc'); });
+        th.setAttribute('data-dir', asc ? 'asc' : 'desc');
+        th.classList.add(asc ? 'sorted-asc' : 'sorted-desc');
+        const rows = Array.from(tbody.querySelectorAll('tr')).filter(r => r.children.length > 1);
+        const key = (r) => {
+            const c = r.children[idx];
+            if (!c) return '';
+            return c.dataset.sort != null ? c.dataset.sort : c.textContent.trim();
+        };
+        rows.sort((a, b) => {
+            let x = key(a), y = key(b);
+            if (type === 'number') {
+                x = parseFloat(x); y = parseFloat(y);
+                if (isNaN(x)) x = -Infinity; if (isNaN(y)) y = -Infinity;
+                return asc ? x - y : y - x;
+            }
+            return asc ? String(x).localeCompare(String(y)) : String(y).localeCompare(String(x));
+        });
+        rows.forEach(r => tbody.appendChild(r));
+    },
+
+    shipmentRow(s, actionCell) {
+        const esc = this.esc;
+        const weight = (s.weight_tons != null && s.weight_tons !== '') ? esc(s.weight_tons) + ' t' : '—';
+        const budget = (s.budget != null && s.budget !== '') ? '$' + esc(s.budget) : '—';
+        return `<tr>
+            <td>${esc(s.origin)} → ${esc(s.destination)}</td>
+            <td>${esc(s.cargo_type)}</td>
+            <td data-sort="${s.weight_tons || 0}">${weight}</td>
+            <td data-sort="${s.budget || 0}">${budget}</td>
+            <td>${esc(s.shipping_date) || 'TBD'}</td>
+            ${actionCell(s)}
+        </tr>`;
+    },
+
+    renderShipments(shipments) {
+        const body = document.getElementById('shipmentsBody');
+        if (!shipments.length) {
+            body.innerHTML = '<tr><td colspan="6">No shipments posted yet.</td></tr>';
             return;
         }
-
-        container.innerHTML = shipments.map(s => `
-            <div class="shipment-card">
-                <h4>${s.origin} → ${s.destination}</h4>
-                <p><strong>Cargo:</strong> ${s.cargo_type}</p>
-                <p><strong>Weight:</strong> ${s.weight_tons || 'N/A'} tons</p>
-                <p><strong>Budget:</strong> $${s.budget || 'N/A'}</p>
-                <p><strong>Shipping Date:</strong> ${s.shipping_date || 'TBD'}</p>
-                ${s.notes ? `<p><strong>Notes:</strong> ${s.notes}</p>` : ''}
-                <p style="color: #0066cc;"><strong>Status:</strong> ${s.status}</p>
-            </div>
-        `).join('');
+        body.innerHTML = shipments.map(s => this.shipmentRow(s, ss => `<td>${this.esc(ss.status)}</td>`)).join('');
     },
 
     renderAvailableShipments(shipments) {
-        const container = document.getElementById('availableShipmentsList');
-
-        if (shipments.length === 0) {
-            container.innerHTML = '<p>No shipments available at this time.</p>';
+        const body = document.getElementById('availableShipmentsBody');
+        if (!shipments.length) {
+            body.innerHTML = '<tr><td colspan="6">No shipments available at this time.</td></tr>';
             return;
         }
-
-        container.innerHTML = shipments.map(s => `
-            <div class="shipment-card">
-                <h4>${s.origin} → ${s.destination}</h4>
-                <p><strong>Cargo:</strong> ${s.cargo_type}</p>
-                <p><strong>Weight:</strong> ${s.weight_tons || 'N/A'} tons</p>
-                <p><strong>Budget:</strong> $${s.budget || 'N/A'}</p>
-                <p><strong>Shipping Date:</strong> ${s.shipping_date || 'TBD'}</p>
-                ${s.notes ? `<p><strong>Notes:</strong> ${s.notes}</p>` : ''}
-                <div class="card-actions">
-                    <button class="btn-primary" onclick="app.openInquiryForm(${s.id})">Inquire</button>
-                </div>
-            </div>
-        `).join('');
+        body.innerHTML = shipments.map(s => this.shipmentRow(s, ss =>
+            `<td><button class="btn-primary btn-sm" onclick="app.openInquiryForm(${ss.id})">Inquire</button></td>`)).join('');
     },
 
     async handleCreateShipment(event) {
@@ -664,10 +688,41 @@ const app = {
             return;
         }
 
-        const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, m => (
-            { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]
-        ));
+        this._carriers = companies || [];
+        document.getElementById('buyAccessBtn').style.display = 'none';
+        document.getElementById('accessStatus').textContent = 'Browse available carriers:';
+        this.applyCarrierFilter();
+    },
 
+    applyCarrierFilter() {
+        const list = this._carriers || [];
+        const searchEl = document.getElementById('carrierDirSearch');
+        const sortEl = document.getElementById('carrierDirSort');
+        const q = (searchEl ? searchEl.value : '').toLowerCase();
+        const sort = sortEl ? sortEl.value : 'name';
+        let filtered = list.filter(c => {
+            const hay = [c.company_name, c.trade_name, c.contact_name, c.city, c.state, c.country, c.carrier_type, c.status]
+                .filter(Boolean).join(' ').toLowerCase();
+            return hay.includes(q);
+        });
+        const keyf = {
+            name: c => (c.company_name || 'zzzz'),
+            location: c => [c.country, c.state, c.city].filter(Boolean).join(' '),
+            type: c => c.carrier_type || '',
+            status: c => c.status || ''
+        }[sort] || (c => c.company_name || 'zzzz');
+        filtered.sort((a, b) => String(keyf(a)).localeCompare(String(keyf(b))));
+        this.renderCarrierCards(filtered);
+    },
+
+    renderCarrierCards(companies) {
+        const esc = this.esc;
+        const container = document.getElementById('companiesList');
+        container.style.display = 'block';
+        if (!companies.length) {
+            container.innerHTML = '<p>No carriers match your search.</p>';
+            return;
+        }
         container.innerHTML = companies.map(c => {
             const loc = esc([c.city, c.state, c.country].filter(Boolean).join(', '));
             const type = esc(c.carrier_type || '');
@@ -696,10 +751,6 @@ const app = {
                     <span class="company-badge company-badge--verified">Confirmed by carrier</span>
                 </div>`;
         }).join('');
-
-        container.style.display = 'block';
-        document.getElementById('buyAccessBtn').style.display = 'none';
-        document.getElementById('accessStatus').textContent = 'Browse available carriers:';
     },
 
     buyShipperAccess() {
@@ -759,21 +810,21 @@ const app = {
     },
 
     renderShipperInquiries(inquiries) {
-        const container = document.getElementById('shipperInquiriesList');
-
-        if (inquiries.length === 0) {
-            container.innerHTML = '<p>No inquiries yet.</p>';
+        const body = document.getElementById('shipperInquiriesBody');
+        if (!inquiries.length) {
+            body.innerHTML = '<tr><td colspan="4">No inquiries yet.</td></tr>';
             return;
         }
-
-        container.innerHTML = inquiries.map(i => `
-            <div class="inquiry-card">
-                <h4>${i.origin} → ${i.destination}</h4>
-                <p><strong>From:</strong> ${i.company_name}</p>
-                <p><strong>Message:</strong> ${i.message || 'No message'}</p>
-                <p style="color: #666; font-size: 12px;">Received: ${new Date(i.created_at).toLocaleString()}</p>
-            </div>
-        `).join('');
+        const esc = this.esc;
+        body.innerHTML = inquiries.map(i => {
+            const disp = i.created_at ? new Date(i.created_at).toLocaleString() : '—';
+            return `<tr>
+                <td>${esc(i.origin)} → ${esc(i.destination)}</td>
+                <td>${esc(i.company_name)}</td>
+                <td>${esc(i.message) || 'No message'}</td>
+                <td data-sort="${esc(i.created_at || '')}">${esc(disp)}</td>
+            </tr>`;
+        }).join('');
     },
 
     async loadCompanyInquiries() {
@@ -792,21 +843,21 @@ const app = {
     },
 
     renderCompanyInquiries(inquiries) {
-        const container = document.getElementById('companyInquiriesList');
-
-        if (inquiries.length === 0) {
-            container.innerHTML = '<p>No inquiries sent yet.</p>';
+        const body = document.getElementById('companyInquiriesBody');
+        if (!inquiries.length) {
+            body.innerHTML = '<tr><td colspan="4">No inquiries sent yet.</td></tr>';
             return;
         }
-
-        container.innerHTML = inquiries.map(i => `
-            <div class="inquiry-card">
-                <h4>${i.origin} → ${i.destination}</h4>
-                <p><strong>Shipper:</strong> ${i.name}</p>
-                <p><strong>Your Message:</strong> ${i.message || 'No message'}</p>
-                <p style="color: #666; font-size: 12px;">Sent: ${new Date(i.created_at).toLocaleString()}</p>
-            </div>
-        `).join('');
+        const esc = this.esc;
+        body.innerHTML = inquiries.map(i => {
+            const disp = i.created_at ? new Date(i.created_at).toLocaleString() : '—';
+            return `<tr>
+                <td>${esc(i.origin)} → ${esc(i.destination)}</td>
+                <td>${esc(i.name)}</td>
+                <td>${esc(i.message) || 'No message'}</td>
+                <td data-sort="${esc(i.created_at || '')}">${esc(disp)}</td>
+            </tr>`;
+        }).join('');
     }
 };
 
