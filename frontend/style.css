@@ -551,7 +551,7 @@ textarea {
 /* ===== Compact static hero (Option C) ===== */
 .hero-compact {
     position: relative;
-    min-height: 80vh;
+    min-height: calc(100vh - 66px);
     background: #0b0e14;
     overflow: hidden;
     padding: 0;
@@ -622,9 +622,25 @@ textarea {
 }
 
 @media (max-width: 640px) {
-    .hero-compact { min-height: 82vh; }
+    .hero-compact { min-height: calc(100vh - 60px); }
     .hero-actions { flex-direction: column; width: 100%; max-width: 320px; }
     .hero-actions .btn-large { width: 100%; }
+}
+
+.hero-howlink {
+    background: none;
+    border: none;
+    color: #cdd8e8;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 6px 4px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+}
+
+.hero-howlink:hover {
+    color: #fff;
 }
 
 /* ===== Landing: trust bar ===== */
@@ -784,6 +800,87 @@ textarea {
 @media (max-width: 720px) {
     .paths-grid { grid-template-columns: 1fr; }
     .path-card { padding: 26px; }
+}
+
+/* ===== How-it-works modal ===== */
+.howmodal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+}
+
+.howmodal.open {
+    display: flex;
+}
+
+.howmodal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 9, 14, 0.72);
+    backdrop-filter: blur(3px);
+}
+
+.howmodal-card {
+    position: relative;
+    z-index: 1;
+    background: #fff;
+    border-radius: 16px;
+    max-width: 940px;
+    width: 100%;
+    padding: 44px 40px 36px;
+    margin: auto;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+}
+
+.howmodal-close {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    background: none;
+    border: none;
+    font-size: 30px;
+    line-height: 1;
+    color: #8b96a8;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 8px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.howmodal-close:hover {
+    background: #f0f2f6;
+    color: #0b0e14;
+}
+
+.howmodal .paths-head {
+    margin-bottom: 32px;
+}
+
+.howmodal-trust {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px 28px;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid #eef1f5;
+    color: #5a6474;
+    font-size: 14px;
+}
+
+.howmodal-trust strong {
+    color: #0b0e14;
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .howmodal { padding: 20px 12px; }
+    .howmodal-card { padding: 40px 22px 28px; }
 }
 
 /* ===== Signup: role info panel + form ===== */

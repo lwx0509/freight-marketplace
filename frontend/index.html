@@ -34,6 +34,7 @@
                         <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I need to ship something →</button>
                         <button class="btn-secondary btn-large btn-on-dark" onclick="app.showSignup('company')">I'm a shipping company</button>
                     </div>
+                    <button class="hero-howlink" onclick="openHowModal()">How it works &amp; pricing</button>
                 </div>
             </section>
             <script>
@@ -49,19 +50,12 @@
             })();
             </script>
 
-            <div class="trustbar">
-                <div class="container trustbar-inner">
-                    <div class="trust-stat"><span class="trust-val">0%</span><span class="trust-label">Broker commission</span></div>
-                    <div class="trust-stat"><span class="trust-val">100%</span><span class="trust-label">Verified carriers</span></div>
-                    <div class="trust-stat"><span class="trust-val">Flat</span><span class="trust-label">Upfront pricing</span></div>
-                    <div class="trust-stat"><span class="trust-val">Global</span><span class="trust-label">Cross-border lanes</span></div>
-                </div>
-            </div>
-
-            <section class="paths-section">
-                <div class="container">
+            <div class="howmodal" id="howModal" aria-hidden="true">
+                <div class="howmodal-backdrop" onclick="closeHowModal()"></div>
+                <div class="howmodal-card" role="dialog" aria-modal="true" aria-label="How FreightLink works">
+                    <button class="howmodal-close" onclick="closeHowModal()" aria-label="Close">×</button>
                     <div class="paths-head">
-                        <div class="paths-eyebrow">Choose your side of the trade</div>
+                        <div class="paths-eyebrow">How FreightLink works</div>
                         <h2 class="paths-title">Two clear paths. Honest, flat pricing.</h2>
                         <p class="paths-lead">No percentage cuts, no surprise fees. You always know exactly what you pay before you connect.</p>
                     </div>
@@ -75,7 +69,7 @@
                                 <li><strong>Browse carriers for $10/mo.</strong> Unlock the full directory of verified carriers anytime.</li>
                                 <li><strong>Connect directly.</strong> Talk to carriers one on one — no middlemen.</li>
                             </ul>
-                            <button class="btn-primary btn-block" onclick="app.showSignup('shipper')">I need to ship something →</button>
+                            <button class="btn-primary btn-block" onclick="closeHowModal(); app.showSignup('shipper')">I need to ship something →</button>
                         </div>
                         <div class="path-card">
                             <h3 class="path-card-title">For shipping companies</h3>
@@ -85,11 +79,34 @@
                                 <li><strong>One flat rate.</strong> $50/month for unlimited browsing and inquiries — no per-lead fees.</li>
                                 <li><strong>Win business directly.</strong> Reach shippers with no broker in between.</li>
                             </ul>
-                            <button class="btn-secondary btn-block" onclick="app.showSignup('company')">Start a carrier account →</button>
+                            <button class="btn-secondary btn-block" onclick="closeHowModal(); app.showSignup('company')">Start a carrier account →</button>
                         </div>
                     </div>
+                    <div class="howmodal-trust">
+                        <span><strong>0%</strong> broker commission</span>
+                        <span><strong>Flat</strong> upfront pricing</span>
+                        <span><strong>Direct</strong> carrier contact</span>
+                        <span><strong>Global</strong> cross-border lanes</span>
+                    </div>
                 </div>
-            </section>
+            </div>
+            <script>
+            function openHowModal() {
+                var m = document.getElementById('howModal');
+                m.classList.add('open');
+                m.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeHowModal() {
+                var m = document.getElementById('howModal');
+                m.classList.remove('open');
+                m.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+            }
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeHowModal();
+            });
+            </script>
 
         </div>
 
