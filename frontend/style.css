@@ -868,12 +868,28 @@ textarea {
     margin-bottom: 32px;
 }
 
+.howmodal-verify {
+    margin-top: 26px;
+    padding: 16px 20px;
+    background: #f0f7f3;
+    border: 1px solid #cdeadd;
+    border-radius: 10px;
+    color: #35505f;
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+.howmodal-verify strong {
+    color: #0b0e14;
+    font-weight: 700;
+}
+
 .howmodal-trust {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 14px 28px;
-    margin-top: 28px;
+    margin-top: 24px;
     padding-top: 24px;
     border-top: 1px solid #eef1f5;
     color: #5a6474;
