@@ -834,6 +834,32 @@ textarea {
     overflow-x: auto;
     border: 1px solid #e3e8ef;
     border-radius: 10px;
+    background:
+        linear-gradient(to right, #fff 30%, rgba(255,255,255,0)) left center,
+        linear-gradient(to left, #fff 30%, rgba(255,255,255,0)) right center,
+        radial-gradient(farthest-side at left center, rgba(0,0,0,0.12), rgba(0,0,0,0)) left center,
+        radial-gradient(farthest-side at right center, rgba(0,0,0,0.12), rgba(0,0,0,0)) right center;
+    background-repeat: no-repeat;
+    background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+}
+
+.table-hint {
+    font-size: 12px;
+    color: #8b96a8;
+    margin: -6px 0 10px;
+}
+
+/* Wide tables: size columns to content (no stretching) and cap any single column. */
+.admin-table.admin-table--wide {
+    width: auto;
+}
+
+.admin-table--wide th,
+.admin-table--wide td {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .admin-table {
