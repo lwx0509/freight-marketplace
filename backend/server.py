@@ -127,7 +127,7 @@ class FreightHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
 
         # Static files
-        if path == '/' or path.startswith('/index') or path == '/claim':
+        if path == '/' or path.startswith('/index') or path in ('/claim', '/terms', '/privacy'):
             self.serve_static(os.path.join(FRONTEND_DIR, 'index.html'), 'text/html')
         elif path.endswith('.js'):
             self.serve_static(os.path.join(FRONTEND_DIR, path.lstrip('/')), 'application/javascript')

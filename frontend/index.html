@@ -12,7 +12,10 @@
         <div id="landingPage" class="page">
             <nav class="navbar">
                 <div class="container">
-                    <h1 class="logo">FreightLink</h1>
+                    <div class="brand">
+                        <h1 class="logo">FreightLink</h1>
+                        <span class="brand-tagline">Clarity in global logistics</span>
+                    </div>
                     <div class="nav-buttons">
                         <button class="btn-secondary" onclick="app.showPage('loginPage')">Log in</button>
                         <button class="btn-primary" onclick="openContactModal()">Contact us</button>
@@ -163,17 +166,11 @@
 
             <footer class="site-footer">
                 <div class="container footer-inner">
-                    <div class="footer-brand">
-                        <div class="footer-logo">FreightLink</div>
-                        <p class="footer-tag">Clarity in global logistics. Cross-border shippers and verified carriers, direct — no middlemen.</p>
-                    </div>
+                    <span class="footer-copy">© 2026 FreightLink · International freight only</span>
                     <nav class="footer-links">
-                        <a href="#" onclick="app.showPage('termsPage'); return false;">Terms of Use</a>
-                        <a href="#" onclick="app.showPage('privacyPage'); return false;">Privacy Policy</a>
+                        <a href="/terms" onclick="app.showPage('termsPage'); return false;">Terms of Use</a>
+                        <a href="/privacy" onclick="app.showPage('privacyPage'); return false;">Privacy Policy</a>
                     </nav>
-                </div>
-                <div class="container footer-bottom">
-                    <span>© 2026 FreightLink · International freight only</span>
                 </div>
             </footer>
 
@@ -226,6 +223,7 @@
                     <input type="hidden" id="signupUserType" value="shipper">
 
                     <button type="submit" class="btn-primary btn-block">Create Account</button>
+                    <p class="signup-agree">By creating an account you agree to our <a href="/terms" target="_blank" rel="noopener">Terms of Use</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</p>
                     <p class="error" id="signupError"></p>
                 </form>
                 </div>

@@ -12,6 +12,16 @@ const app = {
         this.token = localStorage.getItem('token');
         this.user = JSON.parse(localStorage.getItem('user') || 'null');
 
+        // Direct routes to legal pages (e.g. opened in a new tab from signup)
+        if (window.location.pathname === '/terms') {
+            this.showPage('termsPage');
+            return;
+        }
+        if (window.location.pathname === '/privacy') {
+            this.showPage('privacyPage');
+            return;
+        }
+
         // Carrier claim link: /claim?token=...
         const params = new URLSearchParams(window.location.search);
         if (window.location.pathname === '/claim' && params.get('token')) {

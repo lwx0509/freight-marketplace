@@ -38,6 +38,34 @@ body {
     color: #0066cc;
 }
 
+.brand {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.05;
+}
+
+.brand-tagline {
+    font-size: 12px;
+    color: #7a8496;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    margin-top: 2px;
+}
+
+.signup-agree {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #8b96a8;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.signup-agree a {
+    color: #0066cc;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
 .nav-buttons {
     display: flex;
     gap: 10px;
@@ -752,30 +780,20 @@ textarea {
 .site-footer {
     background: #0b0e14;
     color: #93a1b8;
-    padding: 44px 0 28px;
+    padding: 28px 0;
 }
 
 .footer-inner {
     display: flex;
     justify-content: space-between;
-    gap: 28px;
+    align-items: center;
+    gap: 20px;
     flex-wrap: wrap;
-    align-items: flex-start;
 }
 
-.footer-logo {
-    color: #f4f6fa;
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
-}
-
-.footer-tag {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #93a1b8;
-    max-width: 340px;
-    line-height: 1.5;
+.footer-copy {
+    font-size: 13px;
+    color: #6b7688;
 }
 
 .footer-links {
@@ -796,16 +814,8 @@ textarea {
     text-underline-offset: 3px;
 }
 
-.footer-bottom {
-    margin-top: 28px;
-    padding-top: 20px;
-    border-top: 1px solid #1f2a3d;
-    font-size: 13px;
-    color: #6b7688;
-}
-
 @media (max-width: 640px) {
-    .footer-inner { flex-direction: column; gap: 20px; }
+    .footer-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
 }
 
 /* ===== How-it-works modal ===== */
