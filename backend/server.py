@@ -255,21 +255,35 @@ class FreightHandler(BaseHTTPRequestHandler):
             user_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
 
             # Carriers who sign up directly: link to a pre-loaded record if one matches
-            # their email (auto-verify), otherwise add a pending directory record.
+            # their email or FMC Organization Number (auto-verify), otherwise add a
+            # pending directory record.
             if user_type == 'company':
-                match = conn.execute(
-                    "SELECT id FROM carriers WHERE email = ? AND user_id IS NULL",
-                    (email,)
-                ).fetchone()
+                org = (data.get('org_number') or '').strip()
+                match = None
+                if email:
+                    match = conn.execute(
+                        "SELECT id FROM carriers WHERE email = ? AND user_id IS NULL",
+                        (email,)
+                    ).fetchone()
+                if not match and org:
+                    # FMC org numbers are zero-padded (e.g. 000142); match flexibly.
+                    cands = list({org, org.zfill(6), org.lstrip('0')})
+                    ph = ','.join('?' for _ in cands)
+                    match = conn.execute(
+                        f"SELECT id FROM carriers WHERE fmc_id IN ({ph}) AND user_id IS NULL",
+                        cands
+                    ).fetchone()
                 if match:
+                    # Backfill the email onto the FMC record if it had none.
                     conn.execute(
-                        "UPDATE carriers SET status = 'verified', user_id = ?, verified_at = datetime('now') WHERE id = ?",
-                        (user_id, match['id'])
+                        """UPDATE carriers SET status = 'verified', user_id = ?, verified_at = datetime('now'),
+                           email = COALESCE(NULLIF(email, ''), ?) WHERE id = ?""",
+                        (user_id, email, match['id'])
                     )
                 else:
                     conn.execute(
-                        "INSERT INTO carriers (company_name, contact_name, email, status, user_id) VALUES (?, ?, ?, 'pending', ?)",
-                        (company_name or name, name, email, user_id)
+                        "INSERT INTO carriers (company_name, contact_name, email, fmc_id, status, user_id) VALUES (?, ?, ?, ?, 'pending', ?)",
+                        (company_name or name, name, email, org or None, user_id)
                     )
                 conn.commit()
 

@@ -77,7 +77,10 @@ const app = {
         errorEl.textContent = '';
 
         const payload = { email, name, password, user_type: userType };
-        if (userType === 'company') payload.company_name = companyName;
+        if (userType === 'company') {
+            payload.company_name = companyName;
+            payload.org_number = document.getElementById('signupOrgNumber').value;
+        }
 
         try {
             const res = await fetch(`${this.apiUrl}/api/signup`, {
