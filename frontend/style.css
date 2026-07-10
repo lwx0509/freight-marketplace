@@ -548,6 +548,76 @@ textarea {
 }
 
 
+/* ===== Compact static hero (Option C) ===== */
+.hero-compact {
+    position: relative;
+    min-height: 58vh;
+    max-height: 560px;
+    background: #0b0e14;
+    overflow: hidden;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.42;
+    filter: grayscale(45%);
+}
+
+.hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(11,14,20,0.5) 0%, rgba(11,14,20,0.3) 45%, rgba(11,14,20,0.85) 100%);
+}
+
+.hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 720px;
+    padding: 44px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'SF Mono', ui-monospace, Menlo, monospace;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #7dd3fc;
+}
+
+.hero-inner .hero-sub {
+    margin: 0;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+    .hero-compact { min-height: 60vh; max-height: none; }
+    .hero-actions { flex-direction: column; width: 100%; max-width: 320px; }
+    .hero-actions .btn-large { width: 100%; }
+}
+
 /* ===== Signup: role info panel + form ===== */
 .signup-card {
     display: flex;

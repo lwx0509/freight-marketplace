@@ -20,82 +20,18 @@
                 </div>
             </nav>
 
-            <section class="hero hero-cinema" id="heroCinema">
-                <!-- Persistent value proposition (always visible over the cinematic) -->
-                <div class="hero-headline">
+            <section class="hero hero-compact" id="heroCompact">
+                <div class="hero-bg" style="background-image:url('/images/container_ship.jpg')"></div>
+                <div class="hero-inner">
+                    <div class="hero-kicker"><span class="tag-line"></span>International freight only<span class="tag-line"></span></div>
                     <h2 class="hero-title">Skip the brokers.<br><span class="hero-title-accent">Ship cross-border direct.</span></h2>
                     <p class="hero-sub">FreightLink connects shippers with verified international carriers &mdash; one&nbsp;on&nbsp;one. No middlemen marking up your freight, no black-box quotes.</p>
-                </div>
-                <!-- Scene 1: Global Trade Never Sleeps -->
-                <div class="scene active" data-scene="1" data-duration="8500">
-                    <div class="scene-bg" style="background-image:url('/images/container_ship.jpg')"></div>
-                    <div class="scene-content">
-                        <h2 class="scene-display">Global Trade</h2>
-                        <h2 class="scene-display scene-orange">Never Sleeps</h2>
-                        <div class="scene-tag"><span class="tag-line"></span>International freight only<span class="tag-line"></span></div>
+                    <div class="hero-actions">
+                        <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I have cargo to ship →</button>
+                        <button class="btn-secondary btn-large btn-on-dark" onclick="app.showSignup('company')">I'm a shipping company</button>
                     </div>
-                </div>
-                <!-- Scene 2: Logistics is broken -->
-                <div class="scene" data-scene="2" data-duration="7500">
-                    <div class="scene-bg" style="background-image:url('/images/port.jpg')"></div>
-                    <div class="scene-content">
-                        <div class="scene-badge scene-badge-red">The old way</div>
-                        <h2 class="scene-display scene-md">Logistics.<br>Buried in middlemen.</h2>
-                    </div>
-                </div>
-                <!-- Scene 3: No middlemen -->
-                <div class="scene" data-scene="3" data-duration="7500">
-                    <div class="scene-bg" style="background-image:url('/images/globe.jpg')"></div>
-                    <div class="scene-content">
-                        <div class="scene-badge">The FreightLink way</div>
-                        <h2 class="scene-display scene-md">No middlemen.<br>Total clarity.</h2>
-                    </div>
-                </div>
-                <!-- Scene 4: Zero Friction -->
-                <div class="scene" data-scene="4" data-duration="5500">
-                    <div class="scene-content">
-                        <h2 class="scene-display">Zero Friction.</h2>
-                        <div class="scene-tag">Cross-border shippers ↔ verified carriers</div>
-                    </div>
-                </div>
-                <!-- Scene 5: Outro -->
-                <div class="scene" data-scene="5" data-duration="8000">
-                    <div class="scene-glow"></div>
-                    <div class="scene-content">
-                        <div class="scene-logo-row"><span class="scene-diamond"></span>
-                            <h2 class="scene-display">FreightLink</h2>
-                        </div>
-                        <div class="scene-tag">Clarity in Global Logistics</div>
-                    </div>
-                    <span class="frame-mark fm-tl"></span><span class="frame-mark fm-tr"></span>
-                    <span class="frame-mark fm-bl"></span><span class="frame-mark fm-br"></span>
-                </div>
-                <!-- Persistent CTA -->
-                <div class="hero-cta">
-                    <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I have cargo to ship →</button>
-                    <button class="btn-secondary btn-large btn-on-dark" onclick="app.showSignup('company')">I'm a shipping company</button>
                 </div>
             </section>
-            <script>
-            (function () {
-                var scenes = document.querySelectorAll('#heroCinema .scene');
-                var i = 0;
-                function next() {
-                    var old = scenes[i];
-                    old.classList.remove('active');
-                    old.classList.add('prev');
-                    i = (i + 1) % scenes.length;
-                    scenes[i].classList.add('active');
-                    setTimeout(function () { old.classList.remove('prev'); }, 1900);
-                    schedule();
-                }
-                function schedule() {
-                    var dur = parseInt(scenes[i].dataset.duration, 10) || 7000;
-                    setTimeout(next, dur);
-                }
-                schedule();
-            })();
-            </script>
 
         </div>
 
