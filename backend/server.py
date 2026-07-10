@@ -127,7 +127,7 @@ class FreightHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
 
         # Static files
-        if path == '/' or path.startswith('/index'):
+        if path == '/' or path.startswith('/index') or path == '/claim':
             self.serve_static(os.path.join(FRONTEND_DIR, 'index.html'), 'text/html')
         elif path.endswith('.js'):
             self.serve_static(os.path.join(FRONTEND_DIR, path.lstrip('/')), 'application/javascript')
@@ -189,6 +189,8 @@ class FreightHandler(BaseHTTPRequestHandler):
             self.get_inquiries()
         elif path == '/api/admin/carriers':
             self.admin_list_carriers()
+        elif path == '/api/claim':
+            self.get_claim()
         else:
             self.json_response({'error': 'Not found'}, 404)
 
@@ -208,6 +210,8 @@ class FreightHandler(BaseHTTPRequestHandler):
             self.stripe_webhook(data)
         elif path == '/api/admin/verify':
             self.admin_verify_carrier(data)
+        elif path == '/api/claim':
+            self.post_claim(data)
         else:
             self.json_response({'error': 'Not found'}, 404)
 
@@ -247,13 +251,34 @@ class FreightHandler(BaseHTTPRequestHandler):
             )
             conn.commit()
             user_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
+
+            # Carriers who sign up directly: link to a pre-loaded record if one matches
+            # their email (auto-verify), otherwise add a pending directory record.
+            if user_type == 'company':
+                match = conn.execute(
+                    "SELECT id FROM carriers WHERE email = ? AND user_id IS NULL",
+                    (email,)
+                ).fetchone()
+                if match:
+                    conn.execute(
+                        "UPDATE carriers SET status = 'verified', user_id = ?, verified_at = datetime('now') WHERE id = ?",
+                        (user_id, match['id'])
+                    )
+                else:
+                    conn.execute(
+                        "INSERT INTO carriers (company_name, contact_name, email, status, user_id) VALUES (?, ?, ?, 'pending', ?)",
+                        (company_name or name, name, email, user_id)
+                    )
+                conn.commit()
+
             token = create_session(user_id)
             self.json_response({
                 'success': True,
                 'user_id': user_id,
                 'email': email,
                 'token': token,
-                'user_type': user_type
+                'user_type': user_type,
+                'is_admin': False
             }, 201)
         except sqlite3.IntegrityError:
             self.json_response({'error': 'Email already registered'}, 400)
@@ -583,6 +608,94 @@ class FreightHandler(BaseHTTPRequestHandler):
         conn.commit()
         conn.close()
         self.json_response({'success': True})
+
+    # ========== Carrier Claim Endpoints ==========
+    def get_claim(self):
+        """GET /api/claim?token= - fetch a carrier's details for the claim page."""
+        qs = parse_qs(urlparse(self.path).query)
+        token = (qs.get('token') or [''])[0]
+        if not token:
+            self.json_response({'error': 'Missing token'}, 400)
+            return
+
+        conn = get_db()
+        c = conn.execute(
+            """SELECT company_name, contact_name, email, phone, country, lanes, status, user_id
+               FROM carriers WHERE claim_token = ?""",
+            (token,)
+        ).fetchone()
+        conn.close()
+
+        if not c:
+            self.json_response({'error': 'This claim link is not valid.'}, 404)
+            return
+
+        self.json_response({
+            'company_name': c['company_name'],
+            'contact_name': c['contact_name'],
+            'email': c['email'],
+            'phone': c['phone'],
+            'country': c['country'],
+            'lanes': c['lanes'],
+            'claimed': c['user_id'] is not None
+        })
+
+    def post_claim(self, data):
+        """POST /api/claim - confirm details, set a password, create the account, verify."""
+        token = data.get('token', '')
+        password = data.get('password', '')
+        if not token or not password:
+            self.json_response({'error': 'Missing token or password'}, 400)
+            return
+
+        conn = get_db()
+        c = conn.execute("SELECT * FROM carriers WHERE claim_token = ?", (token,)).fetchone()
+        if not c:
+            conn.close()
+            self.json_response({'error': 'This claim link is not valid.'}, 404)
+            return
+        if c['user_id'] is not None:
+            conn.close()
+            self.json_response({'error': 'This listing has already been claimed. Please log in.'}, 400)
+            return
+
+        email = (c['email'] or '').strip().lower()
+        if not email:
+            conn.close()
+            self.json_response({'error': 'No email is on file for this carrier. Please contact support.'}, 400)
+            return
+
+        if conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone():
+            conn.close()
+            self.json_response({'error': 'An account with this email already exists. Please log in.'}, 400)
+            return
+
+        contact_name = (data.get('contact_name') or c['contact_name'] or c['company_name']).strip()
+        phone = (data.get('phone') or c['phone'] or '').strip()
+        lanes = (data.get('lanes') or c['lanes'] or '').strip()
+
+        conn.execute(
+            "INSERT INTO users (email, password_hash, name, user_type, company_name) VALUES (?, ?, ?, 'company', ?)",
+            (email, hash_password(password), contact_name, c['company_name'])
+        )
+        user_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
+        conn.execute(
+            """UPDATE carriers SET status = 'verified', user_id = ?, verified_at = datetime('now'),
+               contact_name = ?, phone = ?, lanes = ? WHERE id = ?""",
+            (user_id, contact_name, phone, lanes, c['id'])
+        )
+        conn.commit()
+        conn.close()
+
+        session_token = create_session(user_id)
+        self.json_response({
+            'success': True,
+            'user_id': user_id,
+            'email': email,
+            'token': session_token,
+            'user_type': 'company',
+            'is_admin': False
+        }, 201)
 
     # ========== Payment Endpoints (Stripe) ==========
     def create_checkout(self, data):

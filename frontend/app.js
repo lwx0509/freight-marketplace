@@ -12,6 +12,13 @@ const app = {
         this.token = localStorage.getItem('token');
         this.user = JSON.parse(localStorage.getItem('user') || 'null');
 
+        // Carrier claim link: /claim?token=...
+        const params = new URLSearchParams(window.location.search);
+        if (window.location.pathname === '/claim' && params.get('token')) {
+            this.startClaim(params.get('token'));
+            return;
+        }
+
         if (this.token && this.user) {
             if (this.user.is_admin) {
                 this.showPage('adminPage');
@@ -138,6 +145,64 @@ const app = {
         this.token = null;
         this.user = null;
         this.showPage('landingPage');
+    },
+
+    // ========== Carrier claim ==========
+    async startClaim(token) {
+        this.claimToken = token;
+        this.showPage('claimPage');
+        try {
+            const res = await fetch(`${this.apiUrl}/api/claim?token=${encodeURIComponent(token)}`);
+            const data = await res.json();
+            if (!res.ok) { this.showClaimInvalid(data.error || 'This link is not valid.'); return; }
+            if (data.claimed) { this.showClaimInvalid('This listing has already been claimed. Please log in.'); return; }
+            document.getElementById('claimCompany').textContent = data.company_name || '';
+            document.getElementById('claimEmail').textContent = data.email || '';
+            document.getElementById('claimContact').value = data.contact_name || '';
+            document.getElementById('claimPhone').value = data.phone || '';
+            document.getElementById('claimLanes').value = data.lanes || '';
+        } catch (err) {
+            this.showClaimInvalid('Something went wrong loading this link.');
+        }
+    },
+
+    showClaimInvalid(msg) {
+        document.getElementById('claimForm').style.display = 'none';
+        document.getElementById('claimInvalid').style.display = 'block';
+        document.getElementById('claimInvalidMsg').textContent = msg;
+    },
+
+    async submitClaim(event) {
+        event.preventDefault();
+        const errorEl = document.getElementById('claimError');
+        errorEl.textContent = '';
+        const payload = {
+            token: this.claimToken,
+            password: document.getElementById('claimPassword').value,
+            contact_name: document.getElementById('claimContact').value,
+            phone: document.getElementById('claimPhone').value,
+            lanes: document.getElementById('claimLanes').value
+        };
+        try {
+            const res = await fetch(`${this.apiUrl}/api/claim`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) { errorEl.textContent = data.error || 'Could not activate listing.'; return; }
+            this.token = data.token;
+            this.user = { id: data.user_id, email: data.email, user_type: data.user_type, is_admin: false };
+            localStorage.setItem('token', this.token);
+            localStorage.setItem('user', JSON.stringify(this.user));
+            if (window.history && window.history.replaceState) {
+                window.history.replaceState({}, '', '/');
+            }
+            this.showPage('dashboardPage');
+            this.loadDashboard();
+        } catch (err) {
+            errorEl.textContent = 'Network error';
+        }
     },
 
     async loadDashboard() {

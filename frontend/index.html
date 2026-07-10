@@ -356,6 +356,38 @@
             </div>
         </div>
 
+        <!-- Carrier Claim Page -->
+        <div id="claimPage" class="page hidden">
+            <nav class="navbar">
+                <div class="container">
+                    <h1 class="logo">FreightLink</h1>
+                </div>
+            </nav>
+            <div class="container form-container">
+                <div id="claimInvalid" style="display:none;">
+                    <h2>Link not valid</h2>
+                    <p id="claimInvalidMsg"></p>
+                    <button class="btn-primary" onclick="app.showPage('landingPage')">Go to homepage</button>
+                </div>
+                <div id="claimForm">
+                    <h2>Claim your carrier listing</h2>
+                    <p class="claim-intro">Confirm your details and set a password to activate your FreightLink listing.</p>
+                    <div class="claim-readonly">
+                        <div class="claim-row"><span class="claim-label">Company</span><span id="claimCompany"></span></div>
+                        <div class="claim-row"><span class="claim-label">Email</span><span id="claimEmail"></span></div>
+                    </div>
+                    <form onsubmit="app.submitClaim(event)">
+                        <input type="text" id="claimContact" placeholder="Contact name">
+                        <input type="text" id="claimPhone" placeholder="Phone">
+                        <input type="text" id="claimLanes" placeholder="Lanes you serve (e.g. Asia–US West Coast)">
+                        <input type="password" id="claimPassword" placeholder="Set a password" required>
+                        <button type="submit" class="btn-primary btn-block">Activate my listing</button>
+                        <p class="error" id="claimError"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Admin Page -->
         <div id="adminPage" class="page hidden">
             <nav class="navbar">
