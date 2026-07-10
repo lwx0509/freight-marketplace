@@ -627,6 +627,47 @@ textarea {
     .hero-actions .btn-large { width: 100%; }
 }
 
+/* ===== Landing: trust bar ===== */
+.trustbar {
+    background: #0f1622;
+    border-top: 1px solid #1f2a3d;
+}
+
+.trustbar-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 20px;
+    flex-wrap: wrap;
+}
+
+.trust-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1 1 140px;
+}
+
+.trust-val {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #f4f6fa;
+}
+
+.trust-label {
+    color: #93a1b8;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+}
+
+@media (max-width: 640px) {
+    .trust-stat { flex: 1 1 40%; }
+}
+
 /* ===== Landing: pricing path cards ===== */
 .paths-section {
     background: #f7f9fc;
