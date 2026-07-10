@@ -564,20 +564,61 @@
                 <div id="companyDashboard" class="dashboard hidden">
                     <h2>Carrier Dashboard</h2>
 
-                    <div class="section">
-                        <h3>Subscription Status</h3>
-                        <p id="subscriptionStatus"></p>
-                        <button id="renewSubscriptionBtn" class="btn-primary" onclick="app.renewCompanySubscription()" style="display: none;">Renew Subscription ($50)</button>
+                    <div class="admin-tabs">
+                        <button class="admin-tab active" id="ctShip" onclick="app.switchCompanyTab('ship')">Available shipments</button>
+                        <button class="admin-tab" id="ctInq" onclick="app.switchCompanyTab('inquiries')">My inquiries</button>
+                        <button class="admin-tab" id="ctAccount" onclick="app.switchCompanyTab('account')">Account</button>
                     </div>
 
-                    <div class="section">
-                        <h3>Available Shipments</h3>
-                        <div id="availableShipmentsList"></div>
+                    <div class="dash-panel" id="cpanShip">
+                        <div class="section">
+                            <h3>Available shipments</h3>
+                            <div id="availableShipmentsList"></div>
+                        </div>
                     </div>
 
-                    <div class="section">
-                        <h3>My Inquiries</h3>
-                        <div id="companyInquiriesList"></div>
+                    <div class="dash-panel" id="cpanInq" style="display: none;">
+                        <div class="section">
+                            <h3>My inquiries</h3>
+                            <div id="companyInquiriesList"></div>
+                        </div>
+                    </div>
+
+                    <div class="dash-panel" id="cpanAccount" style="display: none;">
+                        <div class="section">
+                            <h3>Subscription</h3>
+                            <p id="subscriptionStatus"></p>
+                            <button id="renewSubscriptionBtn" class="btn-primary" onclick="app.renewCompanySubscription()" style="display: none;">Renew Subscription ($50)</button>
+                        </div>
+                        <div class="section">
+                            <h3>Profile</h3>
+                            <form onsubmit="app.saveProfile(event, 'c')">
+                                <input type="text" id="cacctName" placeholder="Contact name" required>
+                                <input type="email" id="cacctEmail" placeholder="Email" required>
+                                <input type="text" id="cacctCompany" placeholder="Company name">
+                                <button type="submit" class="btn-primary">Save profile</button>
+                                <p class="form-note" id="cacctProfileNote"></p>
+                            </form>
+                        </div>
+                        <div class="section">
+                            <h3>Change password</h3>
+                            <form onsubmit="app.submitAccountPw(event, 'c')">
+                                <input type="password" id="cacctCur" placeholder="Current password" required>
+                                <input type="password" id="cacctNew" placeholder="New password (min 6 characters)" required>
+                                <input type="password" id="cacctConf" placeholder="Confirm new password" required>
+                                <button type="submit" class="btn-primary">Update password</button>
+                                <p class="form-note" id="cacctPwNote"></p>
+                            </form>
+                        </div>
+                        <div class="section section--danger">
+                            <h3>Delete account</h3>
+                            <p class="danger-text">This permanently deletes your account. Your directory listing is detached but can still be removed via Contact us. This can't be undone.</p>
+                            <form onsubmit="app.deleteAccount(event, 'c')">
+                                <input type="password" id="cacctDelPw" placeholder="Enter your password to confirm" required>
+                                <button type="submit" class="btn-danger">Delete my account</button>
+                                <p class="form-note" id="cacctDelNote"></p>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

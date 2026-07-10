@@ -183,7 +183,7 @@ const app = {
         }
     },
 
-    // ========== Shipper dashboard tabs + account ==========
+    // ========== Dashboard tabs + account (shared by shipper & carrier) ==========
     switchDashTab(tab) {
         const panels = { post: 'dpPost', ship: 'dpShip', carriers: 'dpCarriers', inquiries: 'dpInquiries', account: 'dpAccount' };
         const btns = { post: 'dtPost', ship: 'dtShip', carriers: 'dtCarriers', inquiries: 'dtInquiries', account: 'dtAccount' };
@@ -193,26 +193,33 @@ const app = {
         });
     },
 
-    async loadProfile() {
+    switchCompanyTab(tab) {
+        const panels = { ship: 'cpanShip', inquiries: 'cpanInq', account: 'cpanAccount' };
+        const btns = { ship: 'ctShip', inquiries: 'ctInq', account: 'ctAccount' };
+        Object.keys(panels).forEach(t => {
+            const p = document.getElementById(panels[t]); if (p) p.style.display = (t === tab) ? 'block' : 'none';
+            const b = document.getElementById(btns[t]); if (b) b.classList.toggle('active', t === tab);
+        });
+    },
+
+    async loadProfile(prefix) {
+        prefix = prefix || '';
         try {
             const res = await fetch(`${this.apiUrl}/api/me`, { headers: { 'Authorization': `Bearer ${this.token}` } });
             if (!res.ok) return;
             const u = await res.json();
-            const n = document.getElementById('acctName'); if (n) n.value = u.name || '';
-            const e = document.getElementById('acctEmail'); if (e) e.value = u.email || '';
-            const c = document.getElementById('acctCompany'); if (c) c.value = u.company_name || '';
+            const set = (id, v) => { const el = document.getElementById(prefix + id); if (el) el.value = v || ''; };
+            set('acctName', u.name); set('acctEmail', u.email); set('acctCompany', u.company_name);
         } catch (err) { console.error('Failed to load profile:', err); }
     },
 
-    async saveProfile(event) {
+    async saveProfile(event, prefix) {
         event.preventDefault();
-        const note = document.getElementById('acctProfileNote');
+        prefix = prefix || '';
+        const g = (id) => document.getElementById(prefix + id);
+        const note = g('acctProfileNote');
         note.style.color = '#e24b4a';
-        const payload = {
-            name: document.getElementById('acctName').value,
-            email: document.getElementById('acctEmail').value,
-            company_name: document.getElementById('acctCompany').value
-        };
+        const payload = { name: g('acctName').value, email: g('acctEmail').value, company_name: g('acctCompany').value };
         try {
             const res = await fetch(`${this.apiUrl}/api/profile`, {
                 method: 'POST',
@@ -229,13 +236,13 @@ const app = {
         } catch (err) { note.textContent = 'Network error'; }
     },
 
-    async submitAccountPw(event) {
+    async submitAccountPw(event, prefix) {
         event.preventDefault();
-        const note = document.getElementById('acctPwNote');
+        prefix = prefix || '';
+        const g = (id) => document.getElementById(prefix + id);
+        const note = g('acctPwNote');
         note.style.color = '#e24b4a';
-        const cur = document.getElementById('acctCur').value;
-        const nw = document.getElementById('acctNew').value;
-        const conf = document.getElementById('acctConf').value;
+        const cur = g('acctCur').value, nw = g('acctNew').value, conf = g('acctConf').value;
         if (nw !== conf) { note.textContent = 'New passwords do not match.'; return; }
         try {
             const res = await fetch(`${this.apiUrl}/api/change-password`, {
@@ -247,23 +254,22 @@ const app = {
             if (!res.ok) { note.textContent = data.error || 'Could not change password.'; return; }
             note.style.color = '#1d9e75';
             note.textContent = 'Password updated.';
-            document.getElementById('acctCur').value = '';
-            document.getElementById('acctNew').value = '';
-            document.getElementById('acctConf').value = '';
+            g('acctCur').value = ''; g('acctNew').value = ''; g('acctConf').value = '';
         } catch (err) { note.textContent = 'Network error'; }
     },
 
-    async deleteAccount(event) {
+    async deleteAccount(event, prefix) {
         event.preventDefault();
-        const note = document.getElementById('acctDelNote');
+        prefix = prefix || '';
+        const g = (id) => document.getElementById(prefix + id);
+        const note = g('acctDelNote');
         note.style.color = '#e24b4a';
         if (!confirm('Delete your account permanently? This cannot be undone.')) return;
-        const pw = document.getElementById('acctDelPw').value;
         try {
             const res = await fetch(`${this.apiUrl}/api/account/delete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
-                body: JSON.stringify({ password: pw })
+                body: JSON.stringify({ password: g('acctDelPw').value })
             });
             const data = await res.json();
             if (!res.ok) { note.textContent = data.error || 'Could not delete account.'; return; }
@@ -382,6 +388,7 @@ const app = {
 
             // Load inquiries
             await this.loadCompanyInquiries();
+            this.loadProfile('c');
 
             // Check subscription status
             // TODO: Check if company has active subscription
