@@ -1287,3 +1287,16 @@ textarea {
     flex: 1;
     min-width: 0;
 }
+
+.field-row select {
+    flex: 1;
+    min-width: 0;
+}
+
+.field-hint {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #94a3b8;
+    font-size: 11px;
+}

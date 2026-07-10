@@ -82,6 +82,11 @@ def migrate_db():
             if col not in ccols:
                 cur.execute(f"ALTER TABLE carriers ADD COLUMN {col} {decl}")
 
+    # deadline column on shipments
+    scols = [r['name'] for r in cur.execute("PRAGMA table_info(shipments)").fetchall()]
+    if scols and 'deadline' not in scols:
+        cur.execute("ALTER TABLE shipments ADD COLUMN deadline TEXT")
+
     # is_admin column on users (only if the table exists and lacks the column)
     tables = [r['name'] for r in cur.execute(
         "SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
@@ -474,7 +479,8 @@ class FreightHandler(BaseHTTPRequestHandler):
         cargo_type = data.get('cargo_type', '').strip()
         weight_tons = data.get('weight_tons')
         budget = data.get('budget')
-        shipping_date = data.get('shipping_date', '').strip()
+        shipping_date = data.get('shipping_date', '').strip()  # ready date
+        deadline = data.get('deadline', '').strip()
         notes = data.get('notes', '').strip()
 
         if not all([origin, destination, cargo_type]):
@@ -482,20 +488,30 @@ class FreightHandler(BaseHTTPRequestHandler):
             conn.close()
             return
 
-        if shipping_date:
+        def parse_date(val, label):
+            if not val:
+                return None, None
             try:
-                if datetime.strptime(shipping_date, '%Y-%m-%d').date() < datetime.utcnow().date():
-                    self.json_response({'error': 'Shipping date cannot be in the past'}, 400)
-                    conn.close()
-                    return
+                d = datetime.strptime(val, '%Y-%m-%d').date()
             except ValueError:
-                self.json_response({'error': 'Invalid shipping date format (expected YYYY-MM-DD)'}, 400)
-                conn.close()
-                return
+                return None, f'Invalid {label} format (expected YYYY-MM-DD)'
+            if d < datetime.utcnow().date():
+                return None, f'{label} cannot be in the past'
+            return d, None
+
+        ready_d, err = parse_date(shipping_date, 'Ready date')
+        if err:
+            self.json_response({'error': err}, 400); conn.close(); return
+        deadline_d, err = parse_date(deadline, 'Deadline')
+        if err:
+            self.json_response({'error': err}, 400); conn.close(); return
+        if ready_d and deadline_d and deadline_d < ready_d:
+            self.json_response({'error': 'Deadline cannot be earlier than the ready date'}, 400)
+            conn.close(); return
 
         conn.execute(
-            'INSERT INTO shipments (shipper_id, origin, destination, cargo_type, weight_tons, budget, shipping_date, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            (user_id, origin, destination, cargo_type, weight_tons, budget, shipping_date, notes)
+            'INSERT INTO shipments (shipper_id, origin, destination, cargo_type, weight_tons, budget, shipping_date, deadline, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            (user_id, origin, destination, cargo_type, weight_tons, budget, shipping_date, deadline, notes)
         )
         conn.commit()
         shipment_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]

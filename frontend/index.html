@@ -484,22 +484,29 @@
                                 <div class="field-group">
                                     <label class="field-label">Origin</label>
                                     <div class="field-row">
-                                        <input type="text" id="shipmentOriginCity" placeholder="City" required>
-                                        <input type="text" id="shipmentOriginState" placeholder="State / Province" required>
+                                        <input type="text" id="shipmentOriginCity" list="cityList" placeholder="City / port" required>
+                                        <select id="shipmentOriginCountry" class="field-select" required><option value="">Country</option></select>
                                     </div>
                                 </div>
                                 <div class="field-group">
                                     <label class="field-label">Destination</label>
                                     <div class="field-row">
-                                        <input type="text" id="shipmentDestCity" placeholder="City" required>
-                                        <input type="text" id="shipmentDestState" placeholder="State / Province" required>
+                                        <input type="text" id="shipmentDestCity" list="cityList" placeholder="City / port" required>
+                                        <select id="shipmentDestCountry" class="field-select" required><option value="">Country</option></select>
                                     </div>
                                 </div>
+                                <datalist id="cityList"></datalist>
                                 <input type="text" id="shipmentCargoType" placeholder="Cargo Type (e.g., Perishable, Hazmat)" required>
                                 <input type="number" id="shipmentWeight" placeholder="Weight (tons)" step="0.1">
                                 <input type="number" id="shipmentBudget" placeholder="Budget (USD)" step="0.01">
-                                <input type="date" id="shipmentDate" placeholder="Shipping Date">
-                                <script>document.getElementById('shipmentDate').min = new Date().toISOString().slice(0, 10);</script>
+                                <div class="field-group">
+                                    <label class="field-label">Ready date <span class="field-hint">— earliest the cargo can ship</span></label>
+                                    <input type="date" id="shipmentReadyDate">
+                                </div>
+                                <div class="field-group">
+                                    <label class="field-label">Deadline <span class="field-hint">— must ship / deliver by</span></label>
+                                    <input type="date" id="shipmentDeadline">
+                                </div>
                                 <textarea id="shipmentNotes" placeholder="Additional details..."></textarea>
                                 <button type="submit" class="btn-primary btn-block">Post Shipment</button>
                             </form>
@@ -526,7 +533,8 @@
                                             <th onclick="app.sortTable(this)">Cargo</th>
                                             <th onclick="app.sortTable(this, 'number')">Weight</th>
                                             <th onclick="app.sortTable(this, 'number')">Budget</th>
-                                            <th onclick="app.sortTable(this)">Shipping date</th>
+                                            <th onclick="app.sortTable(this)">Ready date</th>
+                                            <th onclick="app.sortTable(this)">Deadline</th>
                                             <th onclick="app.sortTable(this)">Status</th>
                                         </tr>
                                     </thead>
@@ -648,7 +656,8 @@
                                             <th onclick="app.sortTable(this)">Cargo</th>
                                             <th onclick="app.sortTable(this, 'number')">Weight</th>
                                             <th onclick="app.sortTable(this, 'number')">Budget</th>
-                                            <th onclick="app.sortTable(this)">Shipping date</th>
+                                            <th onclick="app.sortTable(this)">Ready date</th>
+                                            <th onclick="app.sortTable(this)">Deadline</th>
                                             <th></th>
                                         </tr>
                                     </thead>

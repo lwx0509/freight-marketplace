@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS shipments (
     weight_tons REAL,
     budget REAL,
     shipping_date TEXT,
+    deadline TEXT,
     notes TEXT,
     status TEXT DEFAULT 'active' CHECK (status IN ('active', 'completed', 'cancelled')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

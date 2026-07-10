@@ -3,12 +3,31 @@
  * Vanilla JavaScript SPA
  */
 
+const COUNTRIES = ["Afghanistan","Albania","Algeria","Angola","Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh","Barbados","Belarus","Belgium","Belize","Benin","Bermuda","Bolivia","Bosnia and Herzegovina","Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Cambodia","Cameroon","Canada","Cape Verde","Chile","China","Colombia","Congo","Costa Rica","Croatia","Cuba","Cyprus","Czech Republic","Denmark","Djibouti","Dominican Republic","Ecuador","Egypt","El Salvador","Estonia","Ethiopia","Fiji","Finland","France","Gabon","Gambia","Georgia","Germany","Ghana","Greece","Guatemala","Guinea","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India","Indonesia","Iran","Iraq","Ireland","Israel","Italy","Ivory Coast","Jamaica","Japan","Jordan","Kazakhstan","Kenya","Kuwait","Laos","Latvia","Lebanon","Liberia","Libya","Lithuania","Luxembourg","Macau","Madagascar","Malaysia","Maldives","Mali","Malta","Mauritania","Mauritius","Mexico","Moldova","Mongolia","Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nepal","Netherlands","New Zealand","Nicaragua","Niger","Nigeria","North Macedonia","Norway","Oman","Pakistan","Panama","Papua New Guinea","Paraguay","Peru","Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda","Saudi Arabia","Senegal","Serbia","Sierra Leone","Singapore","Slovakia","Slovenia","Somalia","South Africa","South Korea","Spain","Sri Lanka","Sudan","Suriname","Sweden","Switzerland","Syria","Taiwan","Tanzania","Thailand","Togo","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Uganda","Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+
+const CITIES = ["Shanghai","Ningbo","Shenzhen","Guangzhou","Qingdao","Tianjin","Xiamen","Dalian","Hong Kong","Singapore","Busan","Kaohsiung","Keelung","Tokyo","Yokohama","Kobe","Nagoya","Osaka","Port Klang","Tanjung Pelepas","Jakarta","Surabaya","Manila","Laem Chabang","Bangkok","Ho Chi Minh City","Haiphong","Colombo","Chennai","Mumbai","Nhava Sheva","Mundra","Kolkata","Karachi","Chittagong","Dubai","Jebel Ali","Abu Dhabi","Dammam","Jeddah","Doha","Kuwait City","Salalah","Aqaba","Rotterdam","Antwerp","Hamburg","Bremerhaven","Felixstowe","London","Southampton","Le Havre","Marseille","Barcelona","Valencia","Algeciras","Genoa","La Spezia","Gioia Tauro","Piraeus","Istanbul","Izmir","Gdansk","Gothenburg","Zeebrugge","Dublin","Lisbon","Los Angeles","Long Beach","Oakland","Seattle","Tacoma","New York","Newark","Savannah","Charleston","Houston","Miami","Norfolk","Baltimore","Boston","Vancouver","Montreal","Toronto","Halifax","Manzanillo","Veracruz","Lazaro Cardenas","Santos","Rio de Janeiro","Paranagua","Buenos Aires","Callao","Cartagena","Guayaquil","Valparaiso","San Antonio","Colon","Balboa","Kingston","Durban","Cape Town","Port Elizabeth","Lagos","Tema","Abidjan","Mombasa","Dar es Salaam","Alexandria","Port Said","Tangier","Casablanca","Sydney","Melbourne","Brisbane","Fremantle","Auckland"];
+
 const app = {
     apiUrl: '',
     user: null,
     token: null,
 
+    populateLocationInputs() {
+        const countryOpts = '<option value="">Country</option>' +
+            COUNTRIES.map(c => `<option value="${c}">${c}</option>`).join('');
+        ['shipmentOriginCountry', 'shipmentDestCountry'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.innerHTML = countryOpts;
+        });
+        const dl = document.getElementById('cityList');
+        if (dl) dl.innerHTML = CITIES.map(c => `<option value="${c}"></option>`).join('');
+        const today = new Date().toISOString().slice(0, 10);
+        ['shipmentReadyDate', 'shipmentDeadline'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.min = today;
+        });
+    },
+
     init() {
+        this.populateLocationInputs();
         this.token = localStorage.getItem('token');
         this.user = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -604,7 +623,8 @@ const app = {
             <td>${esc(s.cargo_type)}</td>
             <td data-sort="${s.weight_tons || 0}">${weight}</td>
             <td data-sort="${s.budget || 0}">${budget}</td>
-            <td>${esc(s.shipping_date) || 'TBD'}</td>
+            <td>${esc(s.shipping_date) || '—'}</td>
+            <td>${esc(s.deadline) || '—'}</td>
             ${actionCell(s)}
         </tr>`;
     },
@@ -612,7 +632,7 @@ const app = {
     renderShipments(shipments) {
         const body = document.getElementById('shipmentsBody');
         if (!shipments.length) {
-            body.innerHTML = '<tr><td colspan="6">No shipments posted yet.</td></tr>';
+            body.innerHTML = '<tr><td colspan="7">No shipments posted yet.</td></tr>';
             return;
         }
         body.innerHTML = shipments.map(s => this.shipmentRow(s, ss => `<td>${this.esc(ss.status)}</td>`)).join('');
@@ -621,7 +641,7 @@ const app = {
     renderAvailableShipments(shipments) {
         const body = document.getElementById('availableShipmentsBody');
         if (!shipments.length) {
-            body.innerHTML = '<tr><td colspan="6">No shipments available at this time.</td></tr>';
+            body.innerHTML = '<tr><td colspan="7">No shipments available at this time.</td></tr>';
             return;
         }
         body.innerHTML = shipments.map(s => this.shipmentRow(s, ss =>
@@ -631,22 +651,26 @@ const app = {
     async handleCreateShipment(event) {
         event.preventDefault();
 
-        const dateVal = document.getElementById('shipmentDate').value;
-        if (dateVal) {
-            const today = new Date().toISOString().slice(0, 10);
-            if (dateVal < today) {
-                alert('Shipping date cannot be in the past');
-                return;
-            }
+        const loc = (cityId, countryId) => {
+            const city = document.getElementById(cityId).value.trim();
+            const country = document.getElementById(countryId).value.trim();
+            return [city, country].filter(Boolean).join(', ');
+        };
+        const ready = document.getElementById('shipmentReadyDate').value;
+        const deadline = document.getElementById('shipmentDeadline').value;
+        if (ready && deadline && deadline < ready) {
+            alert('Deadline cannot be earlier than the ready date');
+            return;
         }
 
         const payload = {
-            origin: document.getElementById('shipmentOriginCity').value.trim() + ', ' + document.getElementById('shipmentOriginState').value.trim(),
-            destination: document.getElementById('shipmentDestCity').value.trim() + ', ' + document.getElementById('shipmentDestState').value.trim(),
+            origin: loc('shipmentOriginCity', 'shipmentOriginCountry'),
+            destination: loc('shipmentDestCity', 'shipmentDestCountry'),
             cargo_type: document.getElementById('shipmentCargoType').value,
             weight_tons: parseFloat(document.getElementById('shipmentWeight').value) || null,
             budget: parseFloat(document.getElementById('shipmentBudget').value) || null,
-            shipping_date: document.getElementById('shipmentDate').value,
+            shipping_date: ready,
+            deadline: deadline,
             notes: document.getElementById('shipmentNotes').value
         };
 
