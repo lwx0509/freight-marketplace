@@ -480,6 +480,43 @@ textarea {
 .fm-bl { bottom: 32px; left: 32px; border-bottom: 2px solid #f97316; border-left: 2px solid #f97316; }
 .fm-br { bottom: 32px; right: 32px; border-bottom: 2px solid #f97316; border-right: 2px solid #f97316; }
 
+.hero-headline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    padding: 40px 20px 0;
+    text-align: center;
+    pointer-events: none;
+}
+
+.hero-title {
+    font-size: clamp(26px, 3.4vw, 46px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: #f4f6fa;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.7);
+}
+
+.hero-title-accent {
+    background: linear-gradient(120deg, #38bdf8, #34d399);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #38bdf8;
+}
+
+.hero-sub {
+    max-width: 620px;
+    margin: 16px auto 0;
+    font-size: clamp(14px, 1.4vw, 18px);
+    line-height: 1.5;
+    color: #cdd8e8;
+    text-shadow: 0 1px 14px rgba(0,0,0,0.7);
+}
+
 .hero-cta {
     position: absolute;
     bottom: 48px;

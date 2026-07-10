@@ -21,6 +21,11 @@
             </nav>
 
             <section class="hero hero-cinema" id="heroCinema">
+                <!-- Persistent value proposition (always visible over the cinematic) -->
+                <div class="hero-headline">
+                    <h2 class="hero-title">Skip the brokers.<br><span class="hero-title-accent">Ship cross-border direct.</span></h2>
+                    <p class="hero-sub">FreightLink connects shippers with verified international carriers &mdash; one&nbsp;on&nbsp;one. No middlemen marking up your freight, no black-box quotes.</p>
+                </div>
                 <!-- Scene 1: Global Trade Never Sleeps -->
                 <div class="scene active" data-scene="1" data-duration="8500">
                     <div class="scene-bg" style="background-image:url('/images/container_ship.jpg')"></div>
@@ -109,8 +114,9 @@
                         <div class="role-kicker">How it works</div>
                         <h3>For Shippers</h3>
                         <ol class="role-steps">
-                            <li><strong>List shipments free</strong><span>Post your cargo, route, and budget in minutes.</span></li>
-                            <li><strong>Unlock the directory</strong><span>$10 gets you 15-day access to browse verified companies.</span></li>
+                            <li><strong>List for $1</strong><span>Post your shipment in minutes &mdash; $1 covers your first month live.</span></li>
+                            <li><strong>Keep it live for $5/mo</strong><span>After the first month, $5/month keeps your posting active.</span></li>
+                            <li><strong>Browse carriers for $10/mo</strong><span>Peruse the full directory of verified carriers anytime.</span></li>
                             <li><strong>Connect directly</strong><span>Talk to carriers one-on-one. No middlemen.</span></li>
                         </ol>
                         <p class="role-note">🌍 International shipments only — we don't list domestic freight.</p>
@@ -217,7 +223,7 @@
                     <div class="section">
                         <h3>Browse Shipping Companies</h3>
                         <p id="accessStatus"></p>
-                        <button id="buyAccessBtn" class="btn-primary" onclick="app.buyShipperAccess()" style="display: none;">Buy 15-Day Access ($10)</button>
+                        <button id="buyAccessBtn" class="btn-primary" onclick="app.buyShipperAccess()" style="display: none;">Browse Carriers ($10/mo)</button>
                         <div id="companiesList" style="display: none;"></div>
                     </div>
 

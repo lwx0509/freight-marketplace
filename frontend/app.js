@@ -328,7 +328,7 @@ const app = {
     },
 
     buyShipperAccess() {
-        alert('Stripe integration coming soon. This would charge $10 for 15-day access.');
+        alert('Stripe integration coming soon. This would charge $10/month for carrier directory access.');
         // TODO: Integrate Stripe checkout
     },
 

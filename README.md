@@ -5,8 +5,9 @@ International specialty freight marketplace connecting shippers and shipping com
 ## Features
 
 **Shippers:**
-- Free account and shipment listings
-- $10 for 15-day access to browse shipping companies
+- $1 to list a shipment (covers the first month live)
+- $5/month to keep a posting active after the first month
+- $10/month to browse the carrier directory
 - Direct contact with companies via inquiry form
 
 **Shipping Companies:**
