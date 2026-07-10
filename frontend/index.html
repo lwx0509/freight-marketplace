@@ -33,7 +33,7 @@
                 <div class="hero-overlay"></div>
                 <div class="hero-inner">
                     <h2 class="hero-title">Skip the brokers.<br><span class="hero-title-accent">Ship cross-border direct.</span></h2>
-                    <p class="hero-sub">FreightLink connects anyone shipping internationally with verified carriers &mdash; one&nbsp;on&nbsp;one. No middlemen marking up your freight, no black-box quotes.</p>
+                    <p class="hero-sub">FreightLink connects anyone shipping internationally with FMC-registered carriers &mdash; one&nbsp;on&nbsp;one. No middlemen marking up your freight, no black-box quotes.</p>
                     <div class="hero-actions">
                         <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I need to ship something →</button>
                         <button class="btn-secondary btn-large btn-on-dark" onclick="app.showSignup('company')">I'm a carrier</button>
@@ -44,7 +44,7 @@
             <div class="trustbar">
                 <div class="container trustbar-inner">
                     <div class="trust-stat"><span class="trust-val">0%</span><span class="trust-label">Broker commission</span></div>
-                    <div class="trust-stat"><span class="trust-val">100%</span><span class="trust-label">Verified carriers</span></div>
+                    <div class="trust-stat"><span class="trust-val">9,000+</span><span class="trust-label">FMC-registered carriers</span></div>
                     <div class="trust-stat"><span class="trust-val">Flat</span><span class="trust-label">Upfront pricing</span></div>
                     <div class="trust-stat"><span class="trust-val">Global</span><span class="trust-label">Cross-border lanes</span></div>
                 </div>
@@ -79,7 +79,7 @@
                             <ul class="path-steps">
                                 <li><strong>List for $1.</strong> Post your cargo, route, and budget in minutes — your first month live is covered.</li>
                                 <li><strong>Keep it live for $5/mo.</strong> Stay posted after the first month for a flat monthly rate.</li>
-                                <li><strong>Browse carriers for $10/mo.</strong> Unlock the full directory of verified carriers anytime.</li>
+                                <li><strong>Browse carriers for $10/mo.</strong> Unlock the full directory of FMC-registered carriers anytime.</li>
                                 <li><strong>Connect directly.</strong> Talk to carriers one on one — no middlemen.</li>
                             </ul>
                             <button class="btn-primary btn-block" onclick="closeHowModal(); app.showSignup('shipper')">I need to ship something →</button>
@@ -95,10 +95,10 @@
                             <button class="btn-secondary btn-block" onclick="closeHowModal(); app.showSignup('company')">I'm a carrier →</button>
                         </div>
                     </div>
-                    <p class="howmodal-verify">Every carrier is <a href="https://www2.fmc.gov/oti/NVOCC.aspx" target="_blank" rel="noopener">FMC-registered</a> and verified — not a broker.</p>
+                    <p class="howmodal-verify">Carriers are drawn from the U.S. Federal Maritime Commission's <a href="https://www2.fmc.gov/oti/NVOCC.aspx" target="_blank" rel="noopener">NVOCC registry</a> and confirm their own listings. FreightLink doesn't vet or endorse any party — do your own due diligence before transacting.</p>
                     <div class="howmodal-trust">
                         <span><strong>0%</strong> broker commission</span>
-                        <span><strong>100%</strong> verified carriers</span>
+                        <span><strong>9,000+</strong> FMC-registered carriers</span>
                         <span><strong>Flat</strong> upfront pricing</span>
                         <span><strong>Global</strong> cross-border lanes</span>
                     </div>
@@ -193,7 +193,7 @@
                         <ol class="role-steps">
                             <li><strong>List for $1.</strong><span>Post your cargo, route, and budget in minutes — your first month live is covered.</span></li>
                             <li><strong>Keep it live for $5/mo.</strong><span>Stay posted after the first month at a flat monthly rate.</span></li>
-                            <li><strong>Browse carriers for $10/mo.</strong><span>Unlock the full directory of verified carriers anytime.</span></li>
+                            <li><strong>Browse carriers for $10/mo.</strong><span>Unlock the full directory of FMC-registered carriers anytime.</span></li>
                             <li><strong>Connect directly.</strong><span>Talk to carriers one on one — no middlemen.</span></li>
                         </ol>
                         <p class="role-note">🌍 International shipments only — we don't list domestic freight.</p>
@@ -218,12 +218,12 @@
 
                     <div id="companyNameField" style="display: none;">
                         <input type="text" id="signupCompanyName" placeholder="Company Name">
-                        <input type="text" id="signupOrgNumber" placeholder="FMC Organization Number (optional)">
                     </div>
 
                     <input type="hidden" id="signupUserType" value="shipper">
 
                     <button type="submit" class="btn-primary btn-block">Create Account</button>
+                    <p class="signup-disclaimer">FreightLink is a listings platform and does not vet, endorse, or guarantee any shipper or carrier. All parties are responsible for performing their own due diligence before transacting.</p>
                     <p class="signup-agree">By creating an account you agree to our <a href="/terms" target="_blank" rel="noopener">Terms of Use</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</p>
                     <p class="error" id="signupError"></p>
                 </form>
@@ -365,21 +365,26 @@
                     <p id="claimInvalidMsg"></p>
                     <button class="btn-primary" onclick="app.showPage('landingPage')">Go to homepage</button>
                 </div>
+                <div id="claimDone" style="display:none;">
+                    <h2 id="claimDoneTitle"></h2>
+                    <p id="claimDoneMsg"></p>
+                    <button class="btn-primary" onclick="app.showPage('landingPage')">Done</button>
+                </div>
                 <div id="claimForm">
-                    <h2>Claim your carrier listing</h2>
-                    <p class="claim-intro">Confirm your details and set a password to activate your FreightLink listing.</p>
+                    <h2>Confirm your FreightLink listing</h2>
+                    <p class="claim-intro">Your company appears in the U.S. Federal Maritime Commission's public NVOCC registry. FreightLink lists international carriers so shippers can reach them directly. Please confirm whether you'd like to be listed — this is free, and you can ask to be removed at any time.</p>
                     <div class="claim-readonly">
                         <div class="claim-row"><span class="claim-label">Company</span><span id="claimCompany"></span></div>
-                        <div class="claim-row"><span class="claim-label">Email</span><span id="claimEmail"></span></div>
                     </div>
-                    <form onsubmit="app.submitClaim(event)">
-                        <input type="text" id="claimContact" placeholder="Contact name">
-                        <input type="text" id="claimPhone" placeholder="Phone">
-                        <input type="text" id="claimLanes" placeholder="Lanes you serve (e.g. Asia–US West Coast)">
-                        <input type="password" id="claimPassword" placeholder="Set a password" required>
-                        <button type="submit" class="btn-primary btn-block">Activate my listing</button>
-                        <p class="error" id="claimError"></p>
-                    </form>
+                    <p class="claim-sub">Optionally correct the public details we'd show:</p>
+                    <input type="text" id="claimContact" placeholder="Contact name">
+                    <input type="text" id="claimPhone" placeholder="Phone">
+                    <input type="text" id="claimLanes" placeholder="Lanes you serve (e.g. Asia–US West Coast)">
+                    <div class="claim-actions">
+                        <button class="btn-primary btn-block" onclick="app.submitClaim('confirm')">Yes, list my company</button>
+                        <button class="btn-secondary btn-block" onclick="app.submitClaim('remove')">No thank you, remove me</button>
+                    </div>
+                    <p class="error" id="claimError"></p>
                 </div>
             </div>
         </div>
@@ -414,7 +419,7 @@
                                     <th>Email</th>
                                     <th>Lanes</th>
                                     <th>Status</th>
-                                    <th>Claim link</th>
+                                    <th>Confirm link</th>
                                     <th></th>
                                 </tr>
                             </thead>

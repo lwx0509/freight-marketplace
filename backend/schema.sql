@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS carriers (
     lanes TEXT,
     fmc_id TEXT,
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'verified')),
+    removed INTEGER DEFAULT 0,
     claim_token TEXT UNIQUE,
     user_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

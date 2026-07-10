@@ -69,6 +69,11 @@ def migrate_db():
     cur.execute("CREATE INDEX IF NOT EXISTS idx_carriers_email ON carriers(email)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_carriers_token ON carriers(claim_token)")
 
+    # removed flag on carriers (opt-out / takedown)
+    ccols = [r['name'] for r in cur.execute("PRAGMA table_info(carriers)").fetchall()]
+    if ccols and 'removed' not in ccols:
+        cur.execute("ALTER TABLE carriers ADD COLUMN removed INTEGER DEFAULT 0")
+
     # is_admin column on users (only if the table exists and lacks the column)
     tables = [r['name'] for r in cur.execute(
         "SELECT name FROM sqlite_master WHERE type='table'").fetchall()]
@@ -254,36 +259,25 @@ class FreightHandler(BaseHTTPRequestHandler):
             conn.commit()
             user_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
 
-            # Carriers who sign up directly: link to a pre-loaded record if one matches
-            # their email or FMC Organization Number (auto-verify), otherwise add a
-            # pending directory record.
+            # A carrier signing up directly is themselves consenting to be listed.
+            # If their email matches a pre-loaded record, confirm and link it;
+            # otherwise add a new confirmed directory record for them.
             if user_type == 'company':
-                org = (data.get('org_number') or '').strip()
                 match = None
                 if email:
                     match = conn.execute(
-                        "SELECT id FROM carriers WHERE email = ? AND user_id IS NULL",
+                        "SELECT id FROM carriers WHERE email = ? AND user_id IS NULL AND COALESCE(removed, 0) = 0",
                         (email,)
                     ).fetchone()
-                if not match and org:
-                    # FMC org numbers are zero-padded (e.g. 000142); match flexibly.
-                    cands = list({org, org.zfill(6), org.lstrip('0')})
-                    ph = ','.join('?' for _ in cands)
-                    match = conn.execute(
-                        f"SELECT id FROM carriers WHERE fmc_id IN ({ph}) AND user_id IS NULL",
-                        cands
-                    ).fetchone()
                 if match:
-                    # Backfill the email onto the FMC record if it had none.
                     conn.execute(
-                        """UPDATE carriers SET status = 'verified', user_id = ?, verified_at = datetime('now'),
-                           email = COALESCE(NULLIF(email, ''), ?) WHERE id = ?""",
-                        (user_id, email, match['id'])
+                        "UPDATE carriers SET status = 'verified', removed = 0, user_id = ?, verified_at = datetime('now') WHERE id = ?",
+                        (user_id, match['id'])
                     )
                 else:
                     conn.execute(
-                        "INSERT INTO carriers (company_name, contact_name, email, fmc_id, status, user_id) VALUES (?, ?, ?, ?, 'pending', ?)",
-                        (company_name or name, name, email, org or None, user_id)
+                        "INSERT INTO carriers (company_name, contact_name, email, status, verified_at, user_id) VALUES (?, ?, ?, 'verified', datetime('now'), ?)",
+                        (company_name or name, name, email, user_id)
                     )
                 conn.commit()
 
@@ -461,6 +455,7 @@ class FreightHandler(BaseHTTPRequestHandler):
         carriers = conn.execute(
             """SELECT id, company_name, country, lanes, status
                FROM carriers
+               WHERE COALESCE(removed, 0) = 0
                ORDER BY (status = 'verified') DESC, company_name COLLATE NOCASE"""
         ).fetchall()
         conn.close()
@@ -589,9 +584,9 @@ class FreightHandler(BaseHTTPRequestHandler):
         conn = get_db()
         rows = conn.execute(
             """SELECT id, company_name, contact_name, email, phone, country, lanes,
-                      fmc_id, status, claim_token, created_at, verified_at
+                      fmc_id, status, COALESCE(removed, 0) AS removed, claim_token, created_at, verified_at
                FROM carriers
-               ORDER BY (status = 'pending') DESC, company_name COLLATE NOCASE"""
+               ORDER BY COALESCE(removed, 0) ASC, (status = 'pending') DESC, company_name COLLATE NOCASE"""
         ).fetchall()
         conn.close()
         self.json_response({'carriers': [dict(r) for r in rows]})
@@ -612,37 +607,35 @@ class FreightHandler(BaseHTTPRequestHandler):
         self.json_response({'users': [dict(r) for r in rows]})
 
     def admin_verify_carrier(self, data):
-        """POST /api/admin/verify - flip a carrier's status (admin only)."""
+        """POST /api/admin/verify - carrier listing actions (admin only).
+        action: confirm | unconfirm | remove | restore."""
         if not self.require_admin():
             self.json_response({'error': 'Forbidden'}, 403)
             return
 
         carrier_id = data.get('carrier_id')
-        status = data.get('status', 'verified')
-        if status not in ('verified', 'pending'):
-            status = 'verified'
-        if not carrier_id:
-            self.json_response({'error': 'Missing carrier_id'}, 400)
+        action = data.get('action', '')
+        if not carrier_id or action not in ('confirm', 'unconfirm', 'remove', 'restore'):
+            self.json_response({'error': 'Missing carrier_id or invalid action'}, 400)
             return
 
         conn = get_db()
-        if status == 'verified':
-            conn.execute(
-                "UPDATE carriers SET status = 'verified', verified_at = datetime('now') WHERE id = ?",
-                (carrier_id,)
-            )
-        else:
-            conn.execute(
-                "UPDATE carriers SET status = 'pending', verified_at = NULL WHERE id = ?",
-                (carrier_id,)
-            )
+        if action == 'confirm':
+            conn.execute("UPDATE carriers SET status = 'verified', removed = 0, verified_at = datetime('now') WHERE id = ?", (carrier_id,))
+        elif action == 'unconfirm':
+            conn.execute("UPDATE carriers SET status = 'pending', verified_at = NULL WHERE id = ?", (carrier_id,))
+        elif action == 'remove':
+            conn.execute("UPDATE carriers SET removed = 1 WHERE id = ?", (carrier_id,))
+        elif action == 'restore':
+            conn.execute("UPDATE carriers SET removed = 0 WHERE id = ?", (carrier_id,))
         conn.commit()
         conn.close()
         self.json_response({'success': True})
 
-    # ========== Carrier Claim Endpoints ==========
+    # ========== Carrier Confirmation Endpoints ==========
     def get_claim(self):
-        """GET /api/claim?token= - fetch a carrier's details for the claim page."""
+        """GET /api/claim?token= - fetch a carrier's details for the confirmation page.
+        The unique token is the carrier's proof of identity."""
         qs = parse_qs(urlparse(self.path).query)
         token = (qs.get('token') or [''])[0]
         if not token:
@@ -651,14 +644,14 @@ class FreightHandler(BaseHTTPRequestHandler):
 
         conn = get_db()
         c = conn.execute(
-            """SELECT company_name, contact_name, email, phone, country, lanes, status, user_id
+            """SELECT company_name, contact_name, email, phone, country, lanes, status, removed
                FROM carriers WHERE claim_token = ?""",
             (token,)
         ).fetchone()
         conn.close()
 
         if not c:
-            self.json_response({'error': 'This claim link is not valid.'}, 404)
+            self.json_response({'error': 'This confirmation link is not valid.'}, 404)
             return
 
         self.json_response({
@@ -668,65 +661,47 @@ class FreightHandler(BaseHTTPRequestHandler):
             'phone': c['phone'],
             'country': c['country'],
             'lanes': c['lanes'],
-            'claimed': c['user_id'] is not None
+            'confirmed': c['status'] == 'verified',
+            'removed': bool(c['removed'])
         })
 
     def post_claim(self, data):
-        """POST /api/claim - confirm details, set a password, create the account, verify."""
+        """POST /api/claim - carrier consents to (or opts out of) their listing.
+        No password or account required; the link token is the consent proof."""
         token = data.get('token', '')
-        password = data.get('password', '')
-        if not token or not password:
-            self.json_response({'error': 'Missing token or password'}, 400)
+        action = data.get('action', '')
+        if not token or action not in ('confirm', 'remove'):
+            self.json_response({'error': 'Missing token or invalid action'}, 400)
             return
 
         conn = get_db()
-        c = conn.execute("SELECT * FROM carriers WHERE claim_token = ?", (token,)).fetchone()
+        c = conn.execute("SELECT id FROM carriers WHERE claim_token = ?", (token,)).fetchone()
         if not c:
             conn.close()
-            self.json_response({'error': 'This claim link is not valid.'}, 404)
-            return
-        if c['user_id'] is not None:
-            conn.close()
-            self.json_response({'error': 'This listing has already been claimed. Please log in.'}, 400)
+            self.json_response({'error': 'This confirmation link is not valid.'}, 404)
             return
 
-        email = (c['email'] or '').strip().lower()
-        if not email:
-            conn.close()
-            self.json_response({'error': 'No email is on file for this carrier. Please contact support.'}, 400)
-            return
-
-        if conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone():
-            conn.close()
-            self.json_response({'error': 'An account with this email already exists. Please log in.'}, 400)
-            return
-
-        contact_name = (data.get('contact_name') or c['contact_name'] or c['company_name']).strip()
-        phone = (data.get('phone') or c['phone'] or '').strip()
-        lanes = (data.get('lanes') or c['lanes'] or '').strip()
-
-        conn.execute(
-            "INSERT INTO users (email, password_hash, name, user_type, company_name) VALUES (?, ?, ?, 'company', ?)",
-            (email, hash_password(password), contact_name, c['company_name'])
-        )
-        user_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
-        conn.execute(
-            """UPDATE carriers SET status = 'verified', user_id = ?, verified_at = datetime('now'),
-               contact_name = ?, phone = ?, lanes = ? WHERE id = ?""",
-            (user_id, contact_name, phone, lanes, c['id'])
-        )
+        if action == 'confirm':
+            # Optionally update contact details the carrier corrected on the page.
+            contact = (data.get('contact_name') or '').strip()
+            phone = (data.get('phone') or '').strip()
+            lanes = (data.get('lanes') or '').strip()
+            conn.execute(
+                """UPDATE carriers SET status = 'verified', removed = 0, verified_at = datetime('now'),
+                   contact_name = COALESCE(NULLIF(?, ''), contact_name),
+                   phone = COALESCE(NULLIF(?, ''), phone),
+                   lanes = COALESCE(NULLIF(?, ''), lanes)
+                   WHERE id = ?""",
+                (contact, phone, lanes, c['id'])
+            )
+        else:  # remove
+            conn.execute(
+                "UPDATE carriers SET removed = 1, status = 'pending', verified_at = NULL WHERE id = ?",
+                (c['id'],)
+            )
         conn.commit()
         conn.close()
-
-        session_token = create_session(user_id)
-        self.json_response({
-            'success': True,
-            'user_id': user_id,
-            'email': email,
-            'token': session_token,
-            'user_type': 'company',
-            'is_admin': False
-        }, 201)
+        self.json_response({'success': True, 'action': action})
 
     # ========== Payment Endpoints (Stripe) ==========
     def create_checkout(self, data):

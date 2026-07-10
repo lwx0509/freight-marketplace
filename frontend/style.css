@@ -322,6 +322,12 @@ textarea {
     border: 1px solid #fac775;
 }
 
+.company-badge--removed {
+    color: #791f1f;
+    background: #fcebeb;
+    border: 1px solid #f09595;
+}
+
 .card-actions {
     display: flex;
     gap: 10px;
@@ -682,6 +688,26 @@ textarea {
     text-transform: uppercase;
     letter-spacing: 0.04em;
     font-size: 12px;
+}
+
+.claim-sub {
+    color: #5a6474;
+    font-size: 14px;
+    margin: 12px 0 8px;
+}
+
+.claim-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.signup-disclaimer {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #8b96a8;
+    line-height: 1.5;
 }
 
 /* ===== Admin panel ===== */

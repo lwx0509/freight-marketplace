@@ -77,10 +77,7 @@ const app = {
         errorEl.textContent = '';
 
         const payload = { email, name, password, user_type: userType };
-        if (userType === 'company') {
-            payload.company_name = companyName;
-            payload.org_number = document.getElementById('signupOrgNumber').value;
-        }
+        if (userType === 'company') payload.company_name = companyName;
 
         try {
             const res = await fetch(`${this.apiUrl}/api/signup`, {
@@ -168,9 +165,7 @@ const app = {
             const res = await fetch(`${this.apiUrl}/api/claim?token=${encodeURIComponent(token)}`);
             const data = await res.json();
             if (!res.ok) { this.showClaimInvalid(data.error || 'This link is not valid.'); return; }
-            if (data.claimed) { this.showClaimInvalid('This listing has already been claimed. Please log in.'); return; }
             document.getElementById('claimCompany').textContent = data.company_name || '';
-            document.getElementById('claimEmail').textContent = data.email || '';
             document.getElementById('claimContact').value = data.contact_name || '';
             document.getElementById('claimPhone').value = data.phone || '';
             document.getElementById('claimLanes').value = data.lanes || '';
@@ -185,13 +180,12 @@ const app = {
         document.getElementById('claimInvalidMsg').textContent = msg;
     },
 
-    async submitClaim(event) {
-        event.preventDefault();
+    async submitClaim(action) {
         const errorEl = document.getElementById('claimError');
         errorEl.textContent = '';
         const payload = {
             token: this.claimToken,
-            password: document.getElementById('claimPassword').value,
+            action: action,
             contact_name: document.getElementById('claimContact').value,
             phone: document.getElementById('claimPhone').value,
             lanes: document.getElementById('claimLanes').value
@@ -203,16 +197,17 @@ const app = {
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
-            if (!res.ok) { errorEl.textContent = data.error || 'Could not activate listing.'; return; }
-            this.token = data.token;
-            this.user = { id: data.user_id, email: data.email, user_type: data.user_type, is_admin: false };
-            localStorage.setItem('token', this.token);
-            localStorage.setItem('user', JSON.stringify(this.user));
-            if (window.history && window.history.replaceState) {
-                window.history.replaceState({}, '', '/');
+            if (!res.ok) { errorEl.textContent = data.error || 'Something went wrong.'; return; }
+            document.getElementById('claimForm').style.display = 'none';
+            const done = document.getElementById('claimDone');
+            done.style.display = 'block';
+            if (action === 'confirm') {
+                document.getElementById('claimDoneTitle').textContent = 'Your listing is confirmed';
+                document.getElementById('claimDoneMsg').textContent = 'Thanks — your company is now listed on FreightLink. You can request removal at any time by contacting us.';
+            } else {
+                document.getElementById('claimDoneTitle').textContent = 'Your information has been removed';
+                document.getElementById('claimDoneMsg').textContent = 'Your company will not be listed on FreightLink.';
             }
-            this.showPage('dashboardPage');
-            this.loadDashboard();
         } catch (err) {
             errorEl.textContent = 'Network error';
         }
@@ -368,16 +363,23 @@ const app = {
 
         const origin = window.location.origin;
         body.innerHTML = carriers.map(c => {
-            const claim = c.claim_token ? `${origin}/claim?token=${encodeURIComponent(c.claim_token)}` : '';
-            const badge = c.status === 'verified'
-                ? '<span class="company-badge company-badge--verified">Verified</span>'
-                : '<span class="company-badge company-badge--pending">Pending</span>';
-            const action = c.status === 'pending'
-                ? `<button class="btn-primary btn-sm" onclick="app.verifyCarrier(${c.id}, 'verified')">Verify</button>`
-                : `<button class="btn-secondary btn-sm" onclick="app.verifyCarrier(${c.id}, 'pending')">Unverify</button>`;
+            const link = c.claim_token ? `${origin}/claim?token=${encodeURIComponent(c.claim_token)}` : '';
+            let badge, actions;
+            if (c.removed) {
+                badge = '<span class="company-badge company-badge--removed">Removed</span>';
+                actions = `<button class="btn-secondary btn-sm" onclick="app.verifyCarrier(${c.id}, 'restore')">Restore</button>`;
+            } else if (c.status === 'verified') {
+                badge = '<span class="company-badge company-badge--verified">Confirmed</span>';
+                actions = `<button class="btn-secondary btn-sm" onclick="app.verifyCarrier(${c.id}, 'unconfirm')">Unconfirm</button>
+                           <button class="btn-secondary btn-sm" onclick="app.verifyCarrier(${c.id}, 'remove')">Remove</button>`;
+            } else {
+                badge = '<span class="company-badge company-badge--pending">Pending</span>';
+                actions = `<button class="btn-primary btn-sm" onclick="app.verifyCarrier(${c.id}, 'confirm')">Confirm</button>
+                           <button class="btn-secondary btn-sm" onclick="app.verifyCarrier(${c.id}, 'remove')">Remove</button>`;
+            }
             const lanes = esc([c.lanes, c.country].filter(Boolean).join(' · ')) || '—';
-            const claimCell = claim
-                ? `<button class="btn-link btn-sm" onclick="app.copyText('${claim.replace(/'/g, "\\'")}', this)">Copy</button>`
+            const linkCell = link
+                ? `<button class="btn-link btn-sm" onclick="app.copyText('${link.replace(/'/g, "\\'")}', this)">Copy</button>`
                 : '—';
             return `<tr>
                 <td>${esc(c.company_name)}</td>
@@ -385,18 +387,18 @@ const app = {
                 <td>${esc(c.email) || '—'}</td>
                 <td>${lanes}</td>
                 <td>${badge}</td>
-                <td>${claimCell}</td>
-                <td>${action}</td>
+                <td>${linkCell}</td>
+                <td>${actions}</td>
             </tr>`;
         }).join('');
     },
 
-    async verifyCarrier(id, status) {
+    async verifyCarrier(id, action) {
         try {
             const res = await fetch(`${this.apiUrl}/api/admin/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
-                body: JSON.stringify({ carrier_id: id, status })
+                body: JSON.stringify({ carrier_id: id, action })
             });
             if (res.ok) this.loadAdminCarriers();
         } catch (err) {
@@ -547,16 +549,16 @@ const app = {
             if (c.status === 'pending') {
                 return `
                     <div class="company-card company-card--pending">
-                        <div class="company-name company-name--masked">🔒 Verified carrier</div>
+                        <div class="company-name company-name--masked">🔒 Carrier — details hidden</div>
                         <div class="company-meta">${meta || 'International lanes'}</div>
-                        <span class="company-badge company-badge--pending">Pending verification</span>
+                        <span class="company-badge company-badge--pending">Pending carrier confirmation</span>
                     </div>`;
             }
             return `
                 <div class="company-card">
                     <div class="company-name">${esc(c.company_name)}</div>
                     <div class="company-meta">${meta}</div>
-                    <span class="company-badge company-badge--verified">Verified</span>
+                    <span class="company-badge company-badge--verified">Confirmed by carrier</span>
                 </div>`;
         }).join('');
 
