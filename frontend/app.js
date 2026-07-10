@@ -383,7 +383,7 @@ const app = {
         if (count) count.textContent = `(${carriers.length}${pending ? `, ${pending} pending` : ''})`;
 
         if (!carriers.length) {
-            body.innerHTML = '<tr><td colspan="7">No carriers imported yet.</td></tr>';
+            body.innerHTML = '<tr><td colspan="8">No carriers imported yet.</td></tr>';
             return;
         }
 
@@ -403,7 +403,8 @@ const app = {
                 actions = `<button class="btn-primary btn-sm" onclick="app.verifyCarrier(${c.id}, 'confirm')">Confirm</button>
                            <button class="btn-secondary btn-sm" onclick="app.verifyCarrier(${c.id}, 'remove')">Remove</button>`;
             }
-            const lanes = esc([c.lanes, c.country].filter(Boolean).join(' · ')) || '—';
+            const location = esc([c.city, c.state, c.country].filter(Boolean).join(', ')) || '—';
+            const type = esc(c.carrier_type) || '—';
             const linkCell = link
                 ? `<button class="btn-link btn-sm" onclick="app.copyText('${link.replace(/'/g, "\\'")}', this)">Copy</button>`
                 : '—';
@@ -411,7 +412,8 @@ const app = {
                 <td>${esc(c.company_name)}</td>
                 <td>${esc(c.contact_name) || '—'}</td>
                 <td>${esc(c.email) || '—'}</td>
-                <td>${lanes}</td>
+                <td>${type}</td>
+                <td>${location}</td>
                 <td>${badge}</td>
                 <td>${linkCell}</td>
                 <td>${actions}</td>
@@ -571,19 +573,30 @@ const app = {
         ));
 
         container.innerHTML = companies.map(c => {
-            const meta = esc([c.lanes, c.country].filter(Boolean).join(' · '));
+            const loc = esc([c.city, c.state, c.country].filter(Boolean).join(', '));
+            const type = esc(c.carrier_type || '');
+            const meta = [loc, type].filter(Boolean).join(' · ');
             if (c.status === 'pending') {
                 return `
                     <div class="company-card company-card--pending">
                         <div class="company-name company-name--masked">🔒 Carrier — details hidden</div>
-                        <div class="company-meta">${meta || 'International lanes'}</div>
+                        <div class="company-meta">${meta || 'International carrier'}</div>
                         <span class="company-badge company-badge--pending">Pending carrier confirmation</span>
                     </div>`;
             }
+            const nameLine = esc(c.company_name) + (c.trade_name ? ` <span class="company-dba">(${esc(c.trade_name)})</span>` : '');
+            const contact = [esc(c.contact_name), esc(c.qi_title)].filter(Boolean).join(', ');
+            const details = [
+                contact ? `Contact: ${contact}` : '',
+                c.phone ? `Phone: ${esc(c.phone)}` : '',
+                c.license_number ? `FMC license: ${esc(c.license_number)}` : '',
+                c.renewal_date ? `Registration renews: ${esc(c.renewal_date)}` : ''
+            ].filter(Boolean).map(d => `<div class="company-detail">${d}</div>`).join('');
             return `
                 <div class="company-card">
-                    <div class="company-name">${esc(c.company_name)}</div>
+                    <div class="company-name">${nameLine}</div>
                     <div class="company-meta">${meta}</div>
+                    ${details}
                     <span class="company-badge company-badge--verified">Confirmed by carrier</span>
                 </div>`;
         }).join('');

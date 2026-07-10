@@ -4,24 +4,35 @@ Convert the FMC OTI List export (.xlsx) into the FreightLink import CSV format.
 Usage:
     python3 convert_fmc.py "OTI List ....xlsx" carriers_import.csv [--include-ff] [--us-only]
 
-Maps FMC columns -> import columns:
-    company_name  <- Name
-    contact_name  <- QI 1 (first Qualifying Individual)
-    email         <- (blank; FMC does not publish emails)
-    phone         <- Phone
-    country       <- Nation
-    lanes         <- (blank; FMC does not track trade lanes)
-    fmc_id        <- Organization Number
+Stores a fuller record than the UI shows. Maps FMC columns -> import columns:
+    company_name    <- Name
+    contact_name    <- QI 1 (first Qualifying Individual)
+    qi_title        <- QI 1 Title
+    email           <- (blank; FMC does not publish emails)
+    phone           <- Phone
+    fax             <- Fax
+    country         <- Nation
+    city / state    <- City / State
+    zip / street    <- Zip / Street 1 (+ Street 2)
+    lanes           <- (blank; FMC does not track trade lanes)
+    fmc_id          <- Organization Number
+    license_number  <- License Number
+    trade_name      <- NVOCC DBA Name 1 (fallback FF DBA Name 1)
+    carrier_type    <- NVOCC / FF / NVOCC + FF (from the NVOCC & FF flags)
+    renewal_date    <- Renewal Date (YYYY-MM-DD)
 
-By default only NVOCCs are included (the carrier side). Pass --include-ff to also
-include freight forwarders, --us-only to keep only United States records.
+By default only NVOCCs are included. --include-ff also includes forwarders;
+--us-only keeps only United States records.
 """
 
 import csv
 import sys
+import datetime
 import openpyxl
 
-OUT_FIELDS = ['company_name', 'contact_name', 'email', 'phone', 'country', 'lanes', 'fmc_id']
+OUT_FIELDS = ['company_name', 'contact_name', 'email', 'phone', 'country', 'lanes',
+              'fmc_id', 'trade_name', 'license_number', 'city', 'state', 'zip',
+              'street', 'carrier_type', 'qi_title', 'renewal_date', 'fax']
 
 
 def main():
@@ -37,17 +48,25 @@ def main():
     ws = wb[wb.sheetnames[0]]
 
     rows = ws.iter_rows(values_only=True)
-    # Row 1 is a "List as of" banner; row 2 is the real header.
-    next(rows)
+    next(rows)  # banner row
     header = list(next(rows))
     idx = {name: i for i, name in enumerate(header)}
 
-    def g(row, name):
+    def raw(row, name):
         i = idx.get(name)
-        v = row[i] if (i is not None and i < len(row)) else None
+        return row[i] if (i is not None and i < len(row)) else None
+
+    def g(row, name):
+        v = raw(row, name)
         return ('' if v is None else str(v)).strip()
 
-    total = kept = with_contact = with_phone = 0
+    def gdate(row, name):
+        v = raw(row, name)
+        if isinstance(v, (datetime.datetime, datetime.date)):
+            return v.strftime('%Y-%m-%d')
+        return ('' if v is None else str(v)).strip()[:10]
+
+    total = kept = 0
     seen = set()
     out_rows = []
     for row in rows:
@@ -61,42 +80,53 @@ def main():
         if us_only and g(row, 'Nation').upper() != 'UNITED STATES':
             continue
 
-        org = g(row, 'Organization Number')
         name = g(row, 'Name')
         if not name:
             continue
+        org = g(row, 'Organization Number')
         key = org or name.lower()
         if key in seen:
             continue
         seen.add(key)
 
-        contact = g(row, 'QI 1')
-        phone = g(row, 'Phone')
+        if is_nvocc and is_ff:
+            ctype = 'NVOCC + FF'
+        elif is_nvocc:
+            ctype = 'NVOCC'
+        else:
+            ctype = 'FF'
+
+        street = ' '.join(p for p in [g(row, 'Street 1'), g(row, 'Street 2')] if p)
+        trade = g(row, 'NVOCC DBA Name 1') or g(row, 'FF DBA Name 1')
+
         out_rows.append({
             'company_name': name,
-            'contact_name': contact,
+            'contact_name': g(row, 'QI 1'),
             'email': '',
-            'phone': phone,
+            'phone': g(row, 'Phone'),
             'country': g(row, 'Nation'),
             'lanes': '',
             'fmc_id': org,
+            'trade_name': trade,
+            'license_number': g(row, 'License Number'),
+            'city': g(row, 'City'),
+            'state': g(row, 'State'),
+            'zip': g(row, 'Zip'),
+            'street': street,
+            'carrier_type': ctype,
+            'qi_title': g(row, 'QI 1 Title'),
+            'renewal_date': gdate(row, 'Renewal Date'),
+            'fax': g(row, 'Fax'),
         })
         kept += 1
-        if contact:
-            with_contact += 1
-        if phone:
-            with_phone += 1
 
     with open(outp, 'w', newline='', encoding='utf-8') as f:
         w = csv.DictWriter(f, fieldnames=OUT_FIELDS)
         w.writeheader()
         w.writerows(out_rows)
 
-    print(f'Scanned rows:      {total}')
-    print(f'Written carriers:  {kept}')
-    print(f'  with contact:    {with_contact}')
-    print(f'  with phone:      {with_phone}')
-    print(f'  with email:      0 (FMC provides none)')
+    print(f'Scanned rows:     {total}')
+    print(f'Written carriers: {kept}')
     print(f'Output: {outp}')
 
 

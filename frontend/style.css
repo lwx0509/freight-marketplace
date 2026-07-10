@@ -299,6 +299,17 @@ textarea {
     font-size: 14px;
 }
 
+.company-dba {
+    color: #5a6474;
+    font-weight: 400;
+}
+
+.company-detail {
+    margin-top: 4px;
+    color: #5a6474;
+    font-size: 14px;
+}
+
 .company-badge {
     display: inline-block;
     margin-top: 10px;

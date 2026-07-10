@@ -69,10 +69,18 @@ def migrate_db():
     cur.execute("CREATE INDEX IF NOT EXISTS idx_carriers_email ON carriers(email)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_carriers_token ON carriers(claim_token)")
 
-    # removed flag on carriers (opt-out / takedown)
+    # additional carrier columns (added over time)
     ccols = [r['name'] for r in cur.execute("PRAGMA table_info(carriers)").fetchall()]
-    if ccols and 'removed' not in ccols:
-        cur.execute("ALTER TABLE carriers ADD COLUMN removed INTEGER DEFAULT 0")
+    if ccols:
+        extra = {
+            'removed': 'INTEGER DEFAULT 0',
+            'trade_name': 'TEXT', 'license_number': 'TEXT', 'city': 'TEXT',
+            'state': 'TEXT', 'zip': 'TEXT', 'street': 'TEXT', 'carrier_type': 'TEXT',
+            'qi_title': 'TEXT', 'renewal_date': 'TEXT', 'fax': 'TEXT',
+        }
+        for col, decl in extra.items():
+            if col not in ccols:
+                cur.execute(f"ALTER TABLE carriers ADD COLUMN {col} {decl}")
 
     # is_admin column on users (only if the table exists and lacks the column)
     tables = [r['name'] for r in cur.execute(
@@ -483,7 +491,8 @@ class FreightHandler(BaseHTTPRequestHandler):
 
         conn = get_db()
         carriers = conn.execute(
-            """SELECT id, company_name, country, lanes, status
+            """SELECT id, company_name, contact_name, qi_title, phone, country, city, state,
+                      lanes, trade_name, license_number, carrier_type, renewal_date, status
                FROM carriers
                WHERE COALESCE(removed, 0) = 0
                ORDER BY (status = 'verified') DESC, company_name COLLATE NOCASE"""
@@ -492,23 +501,31 @@ class FreightHandler(BaseHTTPRequestHandler):
 
         result = []
         for c in carriers:
+            # Location and carrier type are shown even while pending.
+            row = {
+                'id': c['id'],
+                'status': 'verified' if c['status'] == 'verified' else 'pending',
+                'city': c['city'],
+                'state': c['state'],
+                'country': c['country'],
+                'carrier_type': c['carrier_type'],
+                'lanes': c['lanes'],
+            }
             if c['status'] == 'verified':
-                result.append({
-                    'id': c['id'],
-                    'status': 'verified',
+                # Confirmed carriers show their full details.
+                row.update({
                     'company_name': c['company_name'],
-                    'country': c['country'],
-                    'lanes': c['lanes'],
+                    'trade_name': c['trade_name'],
+                    'contact_name': c['contact_name'],
+                    'qi_title': c['qi_title'],
+                    'phone': c['phone'],
+                    'license_number': c['license_number'],
+                    'renewal_date': c['renewal_date'],
                 })
             else:
-                # Masked: never expose company_name / contact for pending carriers.
-                result.append({
-                    'id': c['id'],
-                    'status': 'pending',
-                    'company_name': None,
-                    'country': c['country'],
-                    'lanes': c['lanes'],
-                })
+                # Pending: identity stays hidden until the carrier confirms.
+                row['company_name'] = None
+            result.append(row)
 
         self.json_response({'companies': result})
 
@@ -613,8 +630,9 @@ class FreightHandler(BaseHTTPRequestHandler):
 
         conn = get_db()
         rows = conn.execute(
-            """SELECT id, company_name, contact_name, email, phone, country, lanes,
-                      fmc_id, status, COALESCE(removed, 0) AS removed, claim_token, created_at, verified_at
+            """SELECT id, company_name, contact_name, email, phone, country, city, state,
+                      lanes, fmc_id, trade_name, license_number, carrier_type, renewal_date,
+                      status, COALESCE(removed, 0) AS removed, claim_token, created_at, verified_at
                FROM carriers
                ORDER BY COALESCE(removed, 0) ASC, (status = 'pending') DESC, company_name COLLATE NOCASE"""
         ).fetchall()
