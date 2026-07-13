@@ -1,5 +1,5 @@
 """
-Convert the FMC OTI List export (.xlsx) into the FreightLink import CSV format.
+Convert the FMC OTI List export (.xlsx) into the MRFreighter import CSV format.
 
 Usage:
     python3 convert_fmc.py "OTI List ....xlsx" carriers_import.csv [--include-ff] [--us-only]

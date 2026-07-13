@@ -1,5 +1,5 @@
 """
-Set (reset) a FreightLink user's password.
+Set (reset) a MRFreighter user's password.
 
 Usage:
     python3 set_password.py user@example.com 'NewPassword123'

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreightLink - International Freight Marketplace</title>
+    <title>MRFreighter - International Freight Marketplace</title>
+    <link rel="icon" type="image/png" href="/images/mrfreighter-logo.png">
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -12,10 +13,7 @@
         <div id="landingPage" class="page">
             <nav class="navbar">
                 <div class="container">
-                    <div class="brand">
-                        <h1 class="logo">FreightLink</h1>
-                        <span class="brand-tagline">Clarity in global logistics</span>
-                    </div>
+                    <a href="/" class="logo-link"><img src="/images/mrfreighter-logo.png" alt="MRFreighter" class="logo-img"></a>
                     <div class="nav-buttons">
                         <button class="btn-secondary" onclick="app.showPage('loginPage')">Log in</button>
                         <button class="btn-primary" onclick="openContactModal()">Contact us</button>
@@ -33,7 +31,7 @@
                 <div class="hero-overlay"></div>
                 <div class="hero-inner">
                     <h2 class="hero-title">Skip the brokers.<br><span class="hero-title-accent">Ship cross-border direct.</span></h2>
-                    <p class="hero-sub">FreightLink connects anyone shipping internationally with FMC-registered carriers &mdash; one&nbsp;on&nbsp;one. No middlemen marking up your freight, no black-box quotes.</p>
+                    <p class="hero-sub">MRFreighter connects anyone shipping internationally with FMC-registered carriers &mdash; one&nbsp;on&nbsp;one. No middlemen marking up your freight, no black-box quotes.</p>
                     <div class="hero-actions">
                         <button class="btn-primary btn-large" onclick="app.showSignup('shipper')">I need to ship something →</button>
                         <button class="btn-secondary btn-large btn-on-dark" onclick="app.showSignup('company')">I'm a carrier</button>
@@ -65,10 +63,10 @@
 
             <div class="howmodal" id="howModal" aria-hidden="true">
                 <div class="howmodal-backdrop" onclick="closeHowModal()"></div>
-                <div class="howmodal-card" role="dialog" aria-modal="true" aria-label="How FreightLink works">
+                <div class="howmodal-card" role="dialog" aria-modal="true" aria-label="How MRFreighter works">
                     <button class="howmodal-close" onclick="closeHowModal()" aria-label="Close">×</button>
                     <div class="paths-head">
-                        <div class="paths-eyebrow">How FreightLink works</div>
+                        <div class="paths-eyebrow">How MRFreighter works</div>
                         <h2 class="paths-title">Two clear paths. Honest, flat pricing.</h2>
                         <p class="paths-lead">No percentage cuts, no surprise fees. You always know exactly what you pay before you connect.</p>
                     </div>
@@ -95,7 +93,7 @@
                             <button class="btn-secondary btn-block" onclick="closeHowModal(); app.showSignup('company')">I'm a carrier →</button>
                         </div>
                     </div>
-                    <p class="howmodal-verify">FreightLink is a listings directory — not a party to any deal. We don't vet, endorse, or guarantee any carrier or shipper. Do your own due diligence before entering into any agreement.</p>
+                    <p class="howmodal-verify">MRFreighter is a listings directory — not a party to any deal. We don't vet, endorse, or guarantee any carrier or shipper. Do your own due diligence before entering into any agreement.</p>
                     <div class="howmodal-trust">
                         <span><strong>0%</strong> broker commission</span>
                         <span><strong>9,000+</strong> FMC-registered carriers</span>
@@ -129,7 +127,7 @@
                     <div class="paths-head" style="margin-bottom: 24px;">
                         <div class="paths-eyebrow">Contact us</div>
                         <h2 class="paths-title">Get in touch</h2>
-                        <p class="paths-lead">Questions about FreightLink? Send us a message and we'll get back to you.</p>
+                        <p class="paths-lead">Questions about MRFreighter? Send us a message and we'll get back to you.</p>
                     </div>
                     <form class="contact-form" onsubmit="handleContactSubmit(event)">
                         <input type="text" id="contactName" placeholder="Your name" required>
@@ -166,7 +164,7 @@
 
             <footer class="site-footer">
                 <div class="container footer-inner">
-                    <span class="footer-copy">© 2026 FreightLink · International freight only</span>
+                    <span class="footer-copy">© 2026 MRFreighter · International freight only</span>
                     <nav class="footer-links">
                         <a href="/terms" onclick="app.showPage('termsPage'); return false;">Terms of Use</a>
                         <a href="/privacy" onclick="app.showPage('privacyPage'); return false;">Privacy Policy</a>
@@ -180,7 +178,7 @@
         <div id="signupPage" class="page hidden">
             <nav class="navbar">
                 <div class="container">
-                    <h1 class="logo">FreightLink</h1>
+                    <a href="/" class="logo-link"><img src="/images/mrfreighter-logo.png" alt="MRFreighter" class="logo-img"></a>
                     <button class="btn-link" onclick="app.showPage('landingPage')">← Back</button>
                 </div>
             </nav>
@@ -223,7 +221,7 @@
                     <input type="hidden" id="signupUserType" value="shipper">
 
                     <button type="submit" class="btn-primary btn-block">Create Account</button>
-                    <p class="signup-disclaimer">FreightLink is a listings directory — not a party to any deal. We don't vet, endorse, or guarantee any carrier or shipper. Do your own due diligence before entering into any agreement.</p>
+                    <p class="signup-disclaimer">MRFreighter is a listings directory — not a party to any deal. We don't vet, endorse, or guarantee any carrier or shipper. Do your own due diligence before entering into any agreement.</p>
                     <p class="signup-agree">By creating an account you agree to our <a href="/terms" target="_blank" rel="noopener">Terms of Use</a> and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</p>
                     <p class="error" id="signupError"></p>
                 </form>
@@ -235,7 +233,7 @@
         <div id="loginPage" class="page hidden">
             <nav class="navbar">
                 <div class="container">
-                    <h1 class="logo">FreightLink</h1>
+                    <a href="/" class="logo-link"><img src="/images/mrfreighter-logo.png" alt="MRFreighter" class="logo-img"></a>
                     <button class="btn-link" onclick="app.showPage('landingPage')">← Back</button>
                 </div>
             </nav>
@@ -255,7 +253,7 @@
         <div id="termsPage" class="page hidden">
             <nav class="navbar">
                 <div class="container">
-                    <h1 class="logo">FreightLink</h1>
+                    <a href="/" class="logo-link"><img src="/images/mrfreighter-logo.png" alt="MRFreighter" class="logo-img"></a>
                     <button class="btn-link" onclick="app.showPage('landingPage')">← Back</button>
                 </div>
             </nav>
@@ -263,10 +261,10 @@
                 <h1>Terms of Use</h1>
                 <p class="legal-updated">Last updated: July 9, 2026</p>
 
-                <p>Welcome to FreightLink. These Terms of Use ("Terms") govern your access to and use of the FreightLink website and services (the "Service"). By creating an account or using the Service, you agree to these Terms. If you do not agree, do not use the Service.</p>
+                <p>Welcome to MRFreighter. These Terms of Use ("Terms") govern your access to and use of the MRFreighter website and services (the "Service"). By creating an account or using the Service, you agree to these Terms. If you do not agree, do not use the Service.</p>
 
-                <h2>1. What FreightLink is</h2>
-                <p>FreightLink is an online marketplace that connects parties who need to move goods internationally ("Shippers") with freight carriers ("Carriers"). FreightLink is a platform only. We are not a freight broker, forwarder, or carrier, and we are not a party to any agreement, quote, booking, or shipment arranged between users. All transportation arrangements are solely between the Shipper and the Carrier.</p>
+                <h2>1. What MRFreighter is</h2>
+                <p>MRFreighter is an online marketplace that connects parties who need to move goods internationally ("Shippers") with freight carriers ("Carriers"). MRFreighter is a platform only. We are not a freight broker, forwarder, or carrier, and we are not a party to any agreement, quote, booking, or shipment arranged between users. All transportation arrangements are solely between the Shipper and the Carrier.</p>
 
                 <h2>2. Eligibility and accounts</h2>
                 <p>You must be at least 18 years old and able to form a binding contract to use the Service. You are responsible for the accuracy of the information you provide, for keeping your login credentials secure, and for all activity that occurs under your account.</p>
@@ -275,22 +273,22 @@
                 <p>Shippers may post a shipment listing for $1, which covers the first month the listing is live. Keeping a listing active after the first month costs $5 per month. Access to browse the Carrier directory costs $10 per month. Carriers pay $50 per month for unlimited access to listings and inquiries. Fees are billed through our third-party payment processor, are non-refundable except where required by law, and may change with notice. Applicable taxes may apply.</p>
 
                 <h2>4. Carrier listings and verification</h2>
-                <p>Carriers are identified through the U.S. Federal Maritime Commission's registry of licensed ocean freight intermediaries (NVOCCs) and confirm their own company details before being listed. FreightLink makes reasonable efforts to confirm that Carriers are registered operators, but does not guarantee the qualifications, licensing, insurance, performance, or conduct of any user. You are responsible for conducting your own due diligence before entering into any agreement.</p>
+                <p>Carriers are identified through the U.S. Federal Maritime Commission's registry of licensed ocean freight intermediaries (NVOCCs) and confirm their own company details before being listed. MRFreighter makes reasonable efforts to confirm that Carriers are registered operators, but does not guarantee the qualifications, licensing, insurance, performance, or conduct of any user. You are responsible for conducting your own due diligence before entering into any agreement.</p>
 
                 <h2>5. Acceptable use</h2>
                 <p>You agree not to use the Service for any unlawful purpose, to post false or misleading information, to list domestic-only freight (the Service is for international shipments only), to circumvent fees, to harvest other users' data, or to interfere with the operation or security of the Service.</p>
 
                 <h2>6. No warranties</h2>
-                <p>The Service is provided "as is" and "as available" without warranties of any kind, whether express or implied, including fitness for a particular purpose and non-infringement. FreightLink does not warrant that the Service will be uninterrupted, error-free, or secure, or that any listing or user will meet your expectations.</p>
+                <p>The Service is provided "as is" and "as available" without warranties of any kind, whether express or implied, including fitness for a particular purpose and non-infringement. MRFreighter does not warrant that the Service will be uninterrupted, error-free, or secure, or that any listing or user will meet your expectations.</p>
 
                 <h2>7. Limitation of liability</h2>
-                <p>To the fullest extent permitted by law, FreightLink and its owners, employees, and affiliates will not be liable for any indirect, incidental, special, consequential, or punitive damages, or for any loss arising out of agreements or dealings between users. Our total liability for any claim relating to the Service will not exceed the amount you paid to FreightLink in the three months before the claim.</p>
+                <p>To the fullest extent permitted by law, MRFreighter and its owners, employees, and affiliates will not be liable for any indirect, incidental, special, consequential, or punitive damages, or for any loss arising out of agreements or dealings between users. Our total liability for any claim relating to the Service will not exceed the amount you paid to MRFreighter in the three months before the claim.</p>
 
                 <h2>8. Indemnification</h2>
-                <p>You agree to indemnify and hold FreightLink harmless from any claims, losses, or expenses arising out of your use of the Service, your listings or communications, or your dealings with other users.</p>
+                <p>You agree to indemnify and hold MRFreighter harmless from any claims, losses, or expenses arising out of your use of the Service, your listings or communications, or your dealings with other users.</p>
 
                 <h2>9. Termination</h2>
-                <p>You may stop using the Service at any time. We may suspend or terminate your account if you violate these Terms or use the Service in a way that could harm other users or FreightLink.</p>
+                <p>You may stop using the Service at any time. We may suspend or terminate your account if you violate these Terms or use the Service in a way that could harm other users or MRFreighter.</p>
 
                 <h2>10. Changes to these Terms</h2>
                 <p>We may update these Terms from time to time. Material changes will be posted on this page with an updated date. Continued use of the Service after changes take effect constitutes acceptance.</p>
@@ -307,7 +305,7 @@
         <div id="privacyPage" class="page hidden">
             <nav class="navbar">
                 <div class="container">
-                    <h1 class="logo">FreightLink</h1>
+                    <a href="/" class="logo-link"><img src="/images/mrfreighter-logo.png" alt="MRFreighter" class="logo-img"></a>
                     <button class="btn-link" onclick="app.showPage('landingPage')">← Back</button>
                 </div>
             </nav>
@@ -315,7 +313,7 @@
                 <h1>Privacy Policy</h1>
                 <p class="legal-updated">Last updated: July 9, 2026</p>
 
-                <p>This Privacy Policy explains how FreightLink ("we", "us") collects, uses, and shares information when you use our website and services (the "Service").</p>
+                <p>This Privacy Policy explains how MRFreighter ("we", "us") collects, uses, and shares information when you use our website and services (the "Service").</p>
 
                 <h2>1. Information we collect</h2>
                 <p>We collect information you provide directly, including your name, email address, password, and — for Carriers — company name and address, a contact person and phone number, and the lanes you serve. Shippers provide shipment details such as origin, destination, cargo type, weight, budget, and dates. We also collect limited technical data such as your IP address and basic usage information when you interact with the Service.</p>
@@ -327,7 +325,7 @@
                 <p>We use the information we collect to operate the marketplace, create and manage accounts, display listings and facilitate connections between Shippers and Carriers, process payments, provide support, prevent fraud and abuse, and comply with legal obligations.</p>
 
                 <h2>4. How we share information</h2>
-                <p>Because FreightLink is a marketplace, certain details you provide — such as a Carrier's company name and contact information, or a Shipper's shipment listing — are shown to other users so they can connect with you. We also share information with service providers who help us run the Service (such as hosting and payment processing), and when required by law or to protect our rights or users. We do not sell your personal information.</p>
+                <p>Because MRFreighter is a marketplace, certain details you provide — such as a Carrier's company name and contact information, or a Shipper's shipment listing — are shown to other users so they can connect with you. We also share information with service providers who help us run the Service (such as hosting and payment processing), and when required by law or to protect our rights or users. We do not sell your personal information.</p>
 
                 <h2>5. Cookies</h2>
                 <p>We use cookies and similar technologies to keep you signed in and to understand how the Service is used. You can control cookies through your browser settings, though some features may not work without them.</p>
@@ -356,7 +354,7 @@
         <div id="claimPage" class="page hidden">
             <nav class="navbar">
                 <div class="container">
-                    <h1 class="logo">FreightLink</h1>
+                    <a href="/" class="logo-link"><img src="/images/mrfreighter-logo.png" alt="MRFreighter" class="logo-img"></a>
                 </div>
             </nav>
             <div class="container form-container">
@@ -371,8 +369,8 @@
                     <button class="btn-primary" onclick="app.showPage('landingPage')">Done</button>
                 </div>
                 <div id="claimForm">
-                    <h2>Confirm your FreightLink listing</h2>
-                    <p class="claim-intro">Your company appears in the U.S. Federal Maritime Commission's public NVOCC registry. FreightLink lists international carriers so shippers can reach them directly. Please confirm whether you'd like to be listed — this is free, and you can ask to be removed at any time.</p>
+                    <h2>Confirm your MRFreighter listing</h2>
+                    <p class="claim-intro">Your company appears in the U.S. Federal Maritime Commission's public NVOCC registry. MRFreighter lists international carriers so shippers can reach them directly. Please confirm whether you'd like to be listed — this is free, and you can ask to be removed at any time.</p>
                     <div class="claim-readonly">
                         <div class="claim-row"><span class="claim-label">Company</span><span id="claimCompany"></span></div>
                     </div>
@@ -393,7 +391,7 @@
         <div id="adminPage" class="page hidden">
             <nav class="navbar">
                 <div class="container">
-                    <h1 class="logo">FreightLink <span class="admin-tag">Admin</span></h1>
+                    <a href="/" class="logo-link"><img src="/images/mrfreighter-logo.png" alt="MRFreighter" class="logo-img"></a> <span class="admin-tag">Admin</span>
                     <div class="nav-buttons">
                         <button class="btn-secondary" onclick="app.loadAdmin()">Refresh</button>
                         <button class="btn-secondary" onclick="openChangePw()">Change password</button>
@@ -456,7 +454,7 @@
         <div id="dashboardPage" class="page hidden">
             <nav class="navbar">
                 <div class="container">
-                    <h1 class="logo">FreightLink</h1>
+                    <a href="/" class="logo-link"><img src="/images/mrfreighter-logo.png" alt="MRFreighter" class="logo-img"></a>
                     <div class="nav-buttons">
                         <span id="userDisplay"></span>
                         <button class="btn-secondary" onclick="openChangePw()">Change password</button>

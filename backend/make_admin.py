@@ -1,5 +1,5 @@
 """
-Grant (or revoke) admin rights for a FreightLink user.
+Grant (or revoke) admin rights for a MRFreighter user.
 
 Usage:
     python3 make_admin.py user@example.com          # grant admin

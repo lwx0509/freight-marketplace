@@ -342,10 +342,10 @@ const app = {
             done.style.display = 'block';
             if (action === 'confirm') {
                 document.getElementById('claimDoneTitle').textContent = 'Your listing is confirmed';
-                document.getElementById('claimDoneMsg').textContent = 'Thanks — your company is now listed on FreightLink. You can request removal at any time by contacting us.';
+                document.getElementById('claimDoneMsg').textContent = 'Thanks — your company is now listed on MRFreighter. You can request removal at any time by contacting us.';
             } else {
                 document.getElementById('claimDoneTitle').textContent = 'Your information has been removed';
-                document.getElementById('claimDoneMsg').textContent = 'Your company will not be listed on FreightLink.';
+                document.getElementById('claimDoneMsg').textContent = 'Your company will not be listed on MRFreighter.';
             }
         } catch (err) {
             errorEl.textContent = 'Network error';

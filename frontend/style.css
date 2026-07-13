@@ -38,6 +38,18 @@ body {
     color: #0066cc;
 }
 
+.logo-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.logo-img {
+    height: 50px;
+    width: auto;
+    display: block;
+}
+
 .brand {
     display: flex;
     flex-direction: column;

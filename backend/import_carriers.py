@@ -1,5 +1,5 @@
 """
-Import carriers into the FreightLink directory as PENDING (masked) records.
+Import carriers into the MRFreighter directory as PENDING (masked) records.
 
 Usage:
     python3 import_carriers.py path/to/carriers.csv
