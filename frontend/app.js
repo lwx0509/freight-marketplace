@@ -342,10 +342,10 @@ const app = {
             done.style.display = 'block';
             if (action === 'confirm') {
                 document.getElementById('claimDoneTitle').textContent = 'Your listing is confirmed';
-                document.getElementById('claimDoneMsg').textContent = 'Thanks — your company is now listed on MRFreighter. You can request removal at any time by contacting us.';
+                document.getElementById('claimDoneMsg').textContent = 'Thanks — your company is now listed on Mr. Freighter. You can request removal at any time by contacting us.';
             } else {
                 document.getElementById('claimDoneTitle').textContent = 'Your information has been removed';
-                document.getElementById('claimDoneMsg').textContent = 'Your company will not be listed on MRFreighter.';
+                document.getElementById('claimDoneMsg').textContent = 'Your company will not be listed on Mr. Freighter.';
             }
         } catch (err) {
             errorEl.textContent = 'Network error';
